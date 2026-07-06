@@ -567,18 +567,24 @@ async function startAsCaller(roomId,partnerInfo){
 }
 async function startAsCallee(roomId){
   const roomRef=db.collection("rooms").doc(roomId);
-  const snap=await roomRef.get(); if(!snap.exists){ startSearch(); return; }
-  const d=snap.data(); S.roomId=roomId; S.isCaller=false; setPartner(d.callerInfo||{});
+  S.roomId=roomId; S.isCaller=false;
   S.pc=newPC();
   const cc=roomRef.collection("calleeCandidates");
   S.pc.onicecandidate=e=>{ if(e.candidate) cc.add(e.candidate.toJSON()); };
   S.unsub.cand=roomRef.collection("callerCandidates").onSnapshot(sn=>sn.docChanges().forEach(ch=>{ if(ch.type==="added") S.pc.addIceCandidate(new RTCIceCandidate(ch.doc.data())).catch(()=>{}); }));
-  if(d.offer){
-    await S.pc.setRemoteDescription(new RTCSessionDescription(d.offer));
-    const answer=await S.pc.createAnswer(); await S.pc.setLocalDescription(answer);
-    await roomRef.set({answer:{type:answer.type,sdp:answer.sdp}},{merge:true});
-  }
-  S.unsub.room=roomRef.onSnapshot(sn=>{ const dd=sn.data(); if(dd&&dd.ended) partnerLeft(); });
+  let partnerSet=false;
+  // Počúvame izbu priebežne (nie jednorazovým get()) — caller zapisuje offer AŽ PO vytvorení
+  // izby ako samostatný krok, takže pri jednorazovom čítaní by sme ho ľahko zmeškali (race condition).
+  S.unsub.room=roomRef.onSnapshot(async sn=>{
+    const d=sn.data(); if(!d) return;
+    if(!partnerSet){ setPartner(d.callerInfo||{}); partnerSet=true; }
+    if(d.ended){ partnerLeft(); return; }
+    if(d.offer && !S.pc.currentRemoteDescription){
+      await S.pc.setRemoteDescription(new RTCSessionDescription(d.offer));
+      const answer=await S.pc.createAnswer(); await S.pc.setLocalDescription(answer);
+      await roomRef.set({answer:{type:answer.type,sdp:answer.sdp}},{merge:true});
+    }
+  });
   listenMessages(roomId); onMatched();
 }
 function selfInfo(){ return {uid:S.uid,country:S.country,flag:S.flag,countryCode:S.countryCode,isRegistered:S.isRegistered}; }
