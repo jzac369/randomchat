@@ -508,9 +508,10 @@ async function tryFindMatch(){
   const cands=[];
   qs.forEach(doc=>{ const d=doc.data(); if(d.uid===S.uid)return; if(S.moderation.banned[d.uid])return; cands.push(d); });
   const compat=cands.filter(o=>(!S.wantCamOnly||o.hasCamera)&&(!o.wantCamOnly||S.camOn));
-  for(const other of compat){ if(await claimMatch(other.uid)) return; }
+  for(const other of compat){ if(await claimMatch(other)) return; }
 }
-async function claimMatch(otherUid){
+async function claimMatch(other){
+  const otherUid=other.uid;
   const roomId=[S.uid,otherUid].sort().join("__")+"__"+Date.now();
   const myRef=db.collection("queue").doc(S.uid), otRef=db.collection("queue").doc(otherUid);
   try{
@@ -523,8 +524,9 @@ async function claimMatch(otherUid){
     if(!won) return false;
     if(S.unsub.queue){S.unsub.queue();S.unsub.queue=null;}
     S.mode="matched"; await db.collection("queue").doc(S.uid).delete().catch(()=>{});
-    const oSnap=await otRef.get(); const od=oSnap.exists?oSnap.data():{};
-    startAsCaller(roomId,od); return true;
+    // Použi dáta o partnerovi zachytené PRED transakciou — po nej už jeho queue doklad
+    // môže byť zmazaný (callee ho zmaže hneď po spárovaní), čo by inak spôsobilo pretekanie (race condition).
+    startAsCaller(roomId,other); return true;
   }catch(e){ return false; }
 }
 
