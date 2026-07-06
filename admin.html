@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sk">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -100,11 +100,11 @@ input:focus{border-color:#4b3f8c}
 <!-- LOGIN GATE -->
 <div id="gate" class="gate">
   <div class="brand" style="margin-bottom:16px"><span class="orb"></span> NE<b>BULA</b> <span class="tag">ADMIN</span></div>
-  <h2>Prihlásenie moderátora</h2>
-  <p>Prístup majú len účty uvedené v zozname adminov.</p>
-  <label>E-mail</label><input id="gEmail" type="email" placeholder="admin@nebula.sk">
-  <label>Heslo</label><input id="gPass" type="password" placeholder="••••••••">
-  <button class="btn pri" id="gBtn">Prihlásiť sa</button>
+  <h2>Moderator login</h2>
+  <p>Only accounts listed as admins have access.</p>
+  <label>Email</label><input id="gEmail" type="email" placeholder="admin@nebula.sk">
+  <label>Password</label><input id="gPass" type="password" placeholder="••••••••">
+  <button class="btn pri" id="gBtn">Log in</button>
   <div class="err" id="gErr"></div>
 </div>
 
@@ -114,38 +114,38 @@ input:focus{border-color:#4b3f8c}
     <div class="brand"><span class="orb"></span> NE<b>BULA</b> <span class="tag">ADMIN</span></div>
     <div class="spacer"></div>
     <span class="top-email" id="topEmail"></span>
-    <button class="btn" id="logoutBtn">Odhlásiť</button>
+    <button class="btn" id="logoutBtn">Log out</button>
   </div>
 
   <div class="wrap">
     <div class="stats">
-      <div class="stat"><div class="n v" id="sOnline">—</div><div class="l">Online práve teraz</div></div>
-      <div class="stat"><div class="n" id="sWaiting">—</div><div class="l">Čaká vo fronte</div></div>
-      <div class="stat"><div class="n" id="sRooms">—</div><div class="l">Aktívne rozhovory</div></div>
-      <div class="stat"><div class="n" id="sReports">—</div><div class="l">Nevyriešené reporty</div></div>
+      <div class="stat"><div class="n v" id="sOnline">—</div><div class="l">Online right now</div></div>
+      <div class="stat"><div class="n" id="sWaiting">—</div><div class="l">Waiting in queue</div></div>
+      <div class="stat"><div class="n" id="sRooms">—</div><div class="l">Active chats</div></div>
+      <div class="stat"><div class="n" id="sReports">—</div><div class="l">Unresolved reports</div></div>
     </div>
 
     <div class="grid">
       <!-- KEYWORDS -->
       <div class="card">
-        <h3>🛡️ Zakázané slová <span class="count" id="kwCount">0</span></h3>
+        <h3>🛡️ Blocked words <span class="count" id="kwCount">0</span></h3>
         <div class="card-body">
           <div class="add-row">
-            <input id="kwInput" placeholder="pridať slovo a Enter">
-            <button class="btn pri sm" id="kwAdd">Pridať</button>
+            <input id="kwInput" placeholder="add a word and press Enter">
+            <button class="btn pri sm" id="kwAdd">Add</button>
           </div>
           <div class="chips" id="kwChips"></div>
-          <p style="color:var(--muted-2);font-size:12px;margin:14px 0 0">Slová sa v chate automaticky prekryjú hviezdičkami u všetkých účastníkov.</p>
+          <p style="color:var(--muted-2);font-size:12px;margin:14px 0 0">Words are automatically masked with asterisks in chat for all participants.</p>
         </div>
       </div>
 
       <!-- BANNED -->
       <div class="card">
-        <h3>🚫 Zablokovaní používatelia <span class="count" id="banCount">0</span></h3>
+        <h3>🚫 Blocked users <span class="count" id="banCount">0</span></h3>
         <div class="card-body">
           <div class="add-row">
-            <input id="banInput" placeholder="UID používateľa">
-            <button class="btn danger sm" id="banAdd">Zablokovať</button>
+            <input id="banInput" placeholder="User UID">
+            <button class="btn danger sm" id="banAdd">Block</button>
           </div>
           <div id="banList"></div>
         </div>
@@ -153,20 +153,20 @@ input:focus{border-color:#4b3f8c}
 
       <!-- WAITING QUEUE -->
       <div class="card">
-        <h3>⏳ Fronta čakajúcich <span class="count" id="qCount">0</span></h3>
-        <div class="card-body" id="queueList"><div class="empty">Nikto nečaká.</div></div>
+        <h3>⏳ Waiting queue <span class="count" id="qCount">0</span></h3>
+        <div class="card-body" id="queueList"><div class="empty">No one is waiting.</div></div>
       </div>
 
       <!-- REPORTS -->
       <div class="card">
-        <h3>🚩 Nahlásenia <span class="count" id="repCount">0</span></h3>
-        <div class="card-body" id="reportList"><div class="empty">Žiadne nahlásenia.</div></div>
+        <h3>🚩 Reports <span class="count" id="repCount">0</span></h3>
+        <div class="card-body" id="reportList"><div class="empty">No reports.</div></div>
       </div>
 
       <!-- ACTIVE ROOMS -->
       <div class="card full">
-        <h3>💬 Aktívne rozhovory <span class="count" id="roomCount">0</span></h3>
-        <div class="card-body" id="roomList"><div class="empty">Žiadne aktívne rozhovory.</div></div>
+        <h3>💬 Active chats <span class="count" id="roomCount">0</span></h3>
+        <div class="card-body" id="roomList"><div class="empty">No active chats.</div></div>
       </div>
     </div>
   </div>
@@ -192,10 +192,10 @@ const isAdminEmail = e => e && ADMIN_EMAILS.map(x=>x.toLowerCase()).includes(e.t
 el("gBtn").onclick=async()=>{
   const email=el("gEmail").value.trim(), pass=el("gPass").value;
   el("gErr").textContent="";
-  if(!isAdminEmail(email)){ el("gErr").textContent="Tento e-mail nemá admin oprávnenie."; return; }
+  if(!isAdminEmail(email)){ el("gErr").textContent="This email doesn't have admin permission."; return; }
   el("gBtn").disabled=true;
   try{ await auth.signInWithEmailAndPassword(email,pass); }
-  catch(e){ el("gErr").textContent = e.code==="auth/invalid-credential"?"Nesprávny e-mail alebo heslo.":e.message; }
+  catch(e){ el("gErr").textContent = e.code==="auth/invalid-credential"?"Incorrect email or password.":e.message; }
   el("gBtn").disabled=false;
 };
 el("gPass").addEventListener("keydown",e=>{ if(e.key==="Enter") el("gBtn").click(); });
@@ -207,7 +207,7 @@ auth.onAuthStateChanged(user=>{
     el("topEmail").textContent=user.email; startAdmin();
   }else{
     el("panel").classList.add("hidden"); el("gate").classList.remove("hidden");
-    if(user && !isAdminEmail(user.email)){ el("gErr").textContent="Tento účet nemá admin oprávnenie."; auth.signOut(); }
+    if(user && !isAdminEmail(user.email)){ el("gErr").textContent="This account doesn't have admin permission."; auth.signOut(); }
   }
 });
 
@@ -232,18 +232,18 @@ function startAdmin(){
   async function addKeyword(){
     const w=el("kwInput").value.trim().toLowerCase(); if(!w) return;
     await modRef.set({blockedKeywords:FV.arrayUnion(w)},{merge:true});
-    el("kwInput").value=""; toast("Slovo pridané","ok");
+    el("kwInput").value=""; toast("Word added","ok");
   }
   // BAN add
   el("banAdd").onclick=async()=>{
     const uid=el("banInput").value.trim(); if(!uid) return;
     await modRef.set({bannedUsers:{[uid]:true}},{merge:true});
-    el("banInput").value=""; toast("Používateľ zablokovaný","ok");
+    el("banInput").value=""; toast("User blocked","ok");
   };
 
-  window._removeKeyword=async(w)=>{ await modRef.set({blockedKeywords:FV.arrayRemove(w)},{merge:true}); toast("Odstránené"); };
-  window._unban=async(uid)=>{ await modRef.update({["bannedUsers."+uid]:FV.delete()}); toast("Odblokované","ok"); };
-  window._ban=async(uid)=>{ await modRef.set({bannedUsers:{[uid]:true}},{merge:true}); toast("Zablokované","ok"); };
+  window._removeKeyword=async(w)=>{ await modRef.set({blockedKeywords:FV.arrayRemove(w)},{merge:true}); toast("Removed"); };
+  window._unban=async(uid)=>{ await modRef.update({["bannedUsers."+uid]:FV.delete()}); toast("Unblocked","ok"); };
+  window._ban=async(uid)=>{ await modRef.set({bannedUsers:{[uid]:true}},{merge:true}); toast("Blocked","ok"); };
 
   // PRESENCE (online)
   db.collection("presence").onSnapshot(sn=>{ const now=Date.now(); let c=0;
@@ -282,41 +282,41 @@ function renderKeywords(list){
   el("kwCount").textContent=list.length;
   el("kwChips").innerHTML = list.length? list.map(w=>
     `<span class="chip">${esc(w)}<button onclick="_removeKeyword('${esc(w)}')">×</button></span>`).join("")
-    : '<div class="empty">Žiadne zakázané slová.</div>';
+    : '<div class="empty">No blocked words.</div>';
 }
 function renderBanned(map){
   const uids=Object.keys(map||{}).filter(u=>map[u]);
   el("banCount").textContent=uids.length;
   el("banList").innerHTML = uids.length? uids.map(u=>
     `<div class="row-item"><span class="flag">🚫</span><div class="info"><b>${short(u)}</b><small>${esc(u)}</small></div>
-     <button class="btn sm" onclick="_unban('${esc(u)}')">Odblokovať</button></div>`).join("")
-    : '<div class="empty">Nikto nie je zablokovaný.</div>';
+     <button class="btn sm" onclick="_unban('${esc(u)}')">Unblock</button></div>`).join("")
+    : '<div class="empty">No one is blocked.</div>';
 }
 function renderQueue(items){
   el("queueList").innerHTML = items.length? items.map(i=>
     `<div class="row-item"><span class="flag">${i.flag||"🌍"}</span>
-      <div class="info"><b>${esc(i.country||"Neznáma")}</b><small>${short(i.uid)}</small></div>
-      <span class="badge ${i.isRegistered?'reg':'anon'}">${i.isRegistered?'člen':'hosť'}</span>
+      <div class="info"><b>${esc(i.country||"Unknown")}</b><small>${short(i.uid)}</small></div>
+      <span class="badge ${i.isRegistered?'reg':'anon'}">${i.isRegistered?'member':'guest'}</span>
       ${i.hasCamera?'<span class="badge wait">📹</span>':''}
       <button class="btn danger sm" onclick="_ban('${esc(i.uid)}')">Ban</button></div>`).join("")
-    : '<div class="empty">Nikto nečaká.</div>';
+    : '<div class="empty">No one is waiting.</div>';
 }
 function renderReports(reps){
   el("reportList").innerHTML = reps.length? reps.map(r=>
     `<div class="row-item">
       <span class="flag">🚩</span>
-      <div class="info"><b>${esc(r.country||"?")} · ${r.handled?'vyriešené':'nové'}</b>
-        <small>nahlásený: ${short(r.reported)}</small></div>
+      <div class="info"><b>${esc(r.country||"?")} · ${r.handled?'resolved':'new'}</b>
+        <small>reported: ${short(r.reported)}</small></div>
       ${r.handled?'':`<button class="btn danger sm" onclick="_ban('${esc(r.reported)}')">Ban</button>
-      <button class="btn sm" onclick="_resolve('${r.id}')">Vyriešiť</button>`}</div>`).join("")
-    : '<div class="empty">Žiadne nahlásenia.</div>';
+      <button class="btn sm" onclick="_resolve('${r.id}')">Resolve</button>`}</div>`).join("")
+    : '<div class="empty">No reports.</div>';
 }
-window._resolve=async(id)=>{ await db.collection("reports").doc(id).update({handled:true}); toast("Vyriešené","ok"); };
+window._resolve=async(id)=>{ await db.collection("reports").doc(id).update({handled:true}); toast("Resolved","ok"); };
 
 const roomUnsubs={};
 function renderRooms(rooms){
   const host=el("roomList");
-  if(!rooms.length){ host.innerHTML='<div class="empty">Žiadne aktívne rozhovory.</div>'; Object.values(roomUnsubs).forEach(f=>f()); return; }
+  if(!rooms.length){ host.innerHTML='<div class="empty">No active chats.</div>'; Object.values(roomUnsubs).forEach(f=>f()); return; }
   host.innerHTML="";
   rooms.forEach(r=>{
     const ci=r.callerInfo||{}, ce=r.calleeInfo||{};
@@ -324,26 +324,26 @@ function renderRooms(rooms){
     box.innerHTML=`<div style="display:flex;align-items:center;gap:12px;width:100%">
         <span class="flag">${ci.flag||"🌍"}</span>
         <div class="info"><b>${esc(ci.country||"?")} ↔ ${esc(ce.country||"?")} ${ce.flag||""}</b>
-          <small>${short(r.caller)} · režim: ${r.mode||"random"}</small></div>
+          <small>${short(r.caller)} · mode: ${r.mode||"random"}</small></div>
         <span class="badge live">live</span>
-        <button class="btn danger sm" data-close="${r.id}">Ukončiť</button>
+        <button class="btn danger sm" data-close="${r.id}">End</button>
       </div>
-      <div class="room-msgs" id="rm_${r.id}"><div class="empty" style="padding:8px">načítavam…</div></div>`;
+      <div class="room-msgs" id="rm_${r.id}"><div class="empty" style="padding:8px">loading…</div></div>`;
     host.appendChild(box);
-    box.querySelector("[data-close]").onclick=async()=>{ await db.collection("rooms").doc(r.id).set({ended:true},{merge:true}); toast("Rozhovor ukončený","ok"); };
+    box.querySelector("[data-close]").onclick=async()=>{ await db.collection("rooms").doc(r.id).set({ended:true},{merge:true}); toast("Chat ended","ok"); };
     // live messages
     if(roomUnsubs[r.id]) roomUnsubs[r.id]();
     roomUnsubs[r.id]=db.collection("rooms").doc(r.id).collection("messages").orderBy("t","asc").limitToLast(30)
       .onSnapshot(sn=>{
         const cont=el("rm_"+r.id); if(!cont) return;
-        if(sn.empty){ cont.innerHTML='<div class="empty" style="padding:8px">Zatiaľ žiadne správy.</div>'; return; }
+        if(sn.empty){ cont.innerHTML='<div class="empty" style="padding:8px">No messages yet.</div>'; return; }
         cont.innerHTML="";
         sn.forEach(m=>{ const d=m.data();
           const row=document.createElement("div"); row.className="room-msg";
           const who=d.from===r.caller?(ci.flag||"A"):(ce.flag||"B");
-          const body=d.type==="voice"?"🎙️ hlasová správa ("+(d.dur||0)+"s)":esc(d.text||"");
-          row.innerHTML=`<span class="who">${who}</span><span>${body}</span><span class="del" data-del="${m.id}">zmazať</span>`;
-          row.querySelector("[data-del]").onclick=async()=>{ await db.collection("rooms").doc(r.id).collection("messages").doc(m.id).delete(); toast("Správa zmazaná"); };
+          const body=d.type==="voice"?"🎙️ voice message ("+(d.dur||0)+"s)":esc(d.text||"");
+          row.innerHTML=`<span class="who">${who}</span><span>${body}</span><span class="del" data-del="${m.id}">delete</span>`;
+          row.querySelector("[data-del]").onclick=async()=>{ await db.collection("rooms").doc(r.id).collection("messages").doc(m.id).delete(); toast("Message deleted"); };
           cont.appendChild(row);
         });
         cont.scrollTop=cont.scrollHeight;
