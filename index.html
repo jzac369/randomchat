@@ -608,7 +608,10 @@ function listenMessages(roomId){
   S.unsub.msg=db.collection("rooms").doc(roomId).collection("messages").orderBy("t","asc")
     .onSnapshot(sn=>sn.docChanges().forEach(ch=>{ if(ch.type==="added") renderMsg(ch.doc.data()); }));
 }
-function clearMessages(){ el("messages").innerHTML=""; el("messages").appendChild(el("chatEmpty")); el("chatEmpty").style.display="block"; }
+function clearMessages(){
+  const m = el("messages");
+  m.innerHTML = '<div class="chat-empty" id="chatEmpty">Správy sa zobrazia tu.<br>Buď slušný — chat je moderovaný. 💜</div>';
+}
 function addSys(txt){ const d=document.createElement("div"); d.className="msg sys"; d.textContent=txt; el("messages").appendChild(d); scrollMsgs(); }
 function scrollMsgs(){ const m=el("messages"); m.scrollTop=m.scrollHeight; }
 function renderMsg(m){
