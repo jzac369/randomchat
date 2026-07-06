@@ -51,6 +51,9 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
 @keyframes pulse{50%{opacity:.35}}
 .ghost-btn{background:#ffffff0a;border:1px solid var(--line);color:var(--text);padding:9px 15px;border-radius:11px;font-weight:600;font-size:13.5px;transition:.15s}
 .ghost-btn:hover{background:#ffffff14;border-color:#3a2f6e}
+.broadcast-bar{display:flex;align-items:center;gap:12px;padding:10px 18px;background:linear-gradient(120deg,#7c3aed33,#2563eb33);border-bottom:1px solid var(--line-soft);font-size:13.5px}
+.broadcast-bar button{margin-left:auto;background:none;color:var(--muted);font-size:18px}
+.broadcast-bar button:hover{color:var(--text)}
 
 .view{flex:1;min-height:0;display:flex;overflow:hidden}
 .view.center{align-items:center;justify-content:center;padding:24px}
@@ -197,6 +200,10 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
     <span class="pill" id="userPill"><span class="dot"></span><span id="userPillText">Guest</span></span>
     <button class="ghost-btn" id="accountBtn">Account</button>
   </div>
+  <div class="broadcast-bar hidden" id="broadcastBar">
+    <span id="broadcastText"></span>
+    <button id="broadcastClose" title="Dismiss">×</button>
+  </div>
 
   <!-- LANDING -->
   <div class="view center" id="landingView">
@@ -320,6 +327,7 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
 </div>
 
 <div class="toast" id="toast"></div>
+<canvas id="snapCanvas" width="240" height="180" style="display:none"></canvas>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -340,9 +348,9 @@ const S = {
   uid:null, isRegistered:false, email:null, myCode:null,
   country:"Unknown", flag:"🌍", countryCode:"",
   localStream:null, camOn:true, micOn:true, wantCamOnly:false,
-  pc:null, roomId:null, isCaller:false, peer:null, mode:"idle",
+  pc:null, roomId:null, isCaller:false, peer:null, mode:"idle", viewerPc:null, settings:{},
   unsub:{}, searching:false, recorder:null, recChunks:[], recTimer:null, recStart:0, recCancelled:false,
-  moderation:{keywords:[], banned:{}}, retryHandle:null
+  moderation:{keywords:[], banned:{}, bannedEmails:{}}, retryHandle:null
 };
 
 const el = id => document.getElementById(id);
@@ -364,8 +372,36 @@ async function detectCountry(){
       if(g&&g.code){ S.country=g.name||g.code; S.countryCode=g.code; S.flag=flagOf(g.code); return; } }catch(e){}
   }
 }
+/* ============================================================ ANALYTICS (denné počítadlá pre admin grafy) */
+function todayKey(){ return new Date().toISOString().slice(0,10); }
+function logVisit(){ db.collection("analytics").doc(todayKey()).set({
+  visits:FV.increment(1), ["countries."+(S.countryCode||"XX")]:FV.increment(1)
+},{merge:true}).catch(()=>{}); }
+function logChatStarted(){ db.collection("analytics").doc(todayKey()).set({chats:FV.increment(1)},{merge:true}).catch(()=>{}); }
 
-/* ============================================================ AUTH */
+/* ============================================================ APP SETTINGS (ovládané z admin zóny) */
+db.collection("config").doc("appSettings").onSnapshot(snap=>{ S.settings=snap.data()||{}; applySettings(); },()=>{});
+function applySettings(){
+  const s=S.settings||{};
+  el("registerLink").style.display = s.registrationEnabled===false ? "none" : "";
+  const directField=el("connectCode").closest(".field");
+  const hideDirect = s.directChatEnabled===false;
+  if(directField) directField.style.display = hideDirect ? "none" : "";
+  el("directConnectBtn").style.display = hideDirect ? "none" : "";
+  const camOnlyBox=el("optCamOnly");
+  if(s.cameraOnlyForced===true){ camOnlyBox.checked=true; camOnlyBox.disabled=true; }
+  else { camOnlyBox.disabled=false; }
+}
+
+/* ============================================================ BROADCAST (oznam od admina) */
+db.collection("config").doc("broadcast").onSnapshot(snap=>{
+  const d=snap.data()||{};
+  if(d.active && d.message){ el("broadcastText").textContent=d.message; el("broadcastBar").classList.remove("hidden"); }
+  else { el("broadcastBar").classList.add("hidden"); }
+},()=>{});
+el("broadcastClose").onclick=()=>el("broadcastBar").classList.add("hidden");
+
+
 auth.onAuthStateChanged(async user=>{
   if(!user){ await auth.signInAnonymously().catch(e=>toast("Login error: "+e.message,"err")); return; }
   S.uid=user.uid; S.isRegistered=!user.isAnonymous; S.email=user.email;
@@ -424,19 +460,34 @@ el("accountClose").onclick=()=>el("accountModal").classList.remove("open");
 el("logoutLink").onclick=async()=>{ await auth.signOut(); location.reload(); };
 
 /* ============================================================ MODERATION */
+function isBanActive(val){
+  if(!val) return false;
+  if(val===true) return true; // trvalý ban
+  return typeof val==="number" && Date.now()<val; // dočasný ban — číslo = čas expirácie (ms)
+}
 db.collection("config").doc("moderation").onSnapshot(snap=>{
   const d=snap.data()||{};
   S.moderation.keywords=(d.blockedKeywords||[]).map(k=>k.toLowerCase());
   S.moderation.banned=d.bannedUsers||{};
-  if(S.uid&&S.moderation.banned[S.uid]) handleBanned();
+  S.moderation.bannedEmails=d.bannedEmails||{};
+  const myEmailBan = S.email && S.moderation.bannedEmails[S.email.toLowerCase()];
+  if(S.uid && (isBanActive(S.moderation.banned[S.uid]) || isBanActive(myEmailBan))) handleBanned();
 },()=>{});
 function handleBanned(){ cleanupConnection(); leaveQueue(); showView("landing");
   toast("Your access has been blocked by a moderator.","err");
   el("startBtn").disabled=true; el("startBtn").textContent="Access blocked"; }
+// Maskovanie osobných údajov (e-mail, telefónne čísla) — chráni používateľov pred
+// nechceným zdieľaním kontaktov v moderovanom chate, nezávisle od zoznamu zakázaných slov.
+const EMAIL_RE=/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+const PHONE_RE=/(\+?\d[\d\s\-().]{6,}\d)/g;
 function filterText(txt){ let flagged=false,out=txt;
   for(const kw of S.moderation.keywords){ if(!kw)continue;
     const re=new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi");
     if(re.test(out)){ flagged=true; out=out.replace(re,m=>"*".repeat(m.length)); } }
+  if(EMAIL_RE.test(out)){ flagged=true; out=out.replace(EMAIL_RE,"[email hidden]"); }
+  EMAIL_RE.lastIndex=0;
+  if(PHONE_RE.test(out)){ flagged=true; out=out.replace(PHONE_RE,"[number hidden]"); }
+  PHONE_RE.lastIndex=0;
   return {out,flagged}; }
 
 /* ============================================================ MEDIA */
@@ -482,7 +533,7 @@ el("startBtn").onclick=async()=>{
   el("localFlag").textContent=S.flag; showView("chat"); el("startBtn").disabled=false; startSearch();
 };
 el("nextBtn").onclick=()=>nextPartner();
-el("stopBtn").onclick=()=>{ cleanupConnection(); leaveQueue(); showView("landing"); };
+el("stopBtn").onclick=()=>{ if(S.roomId) db.collection("rooms").doc(S.roomId).set({ended:true,endedAt:FV.serverTimestamp()},{merge:true}).catch(()=>{}); cleanupConnection(); leaveQueue(); showView("landing"); };
 
 function setSearchingUI(on,sub){
   S.searching=on; el("searchingOverlay").style.display=on?"grid":"none"; el("nextBtn").disabled=on;
@@ -524,7 +575,7 @@ async function tryFindMatch(){
   try{ qs=await db.collection("queue").where("matched","==",false).orderBy("createdAt","asc").limit(12).get(); }
   catch(e){ qs=await db.collection("queue").where("matched","==",false).limit(12).get(); }
   const cands=[];
-  qs.forEach(doc=>{ const d=doc.data(); if(d.uid===S.uid)return; if(S.moderation.banned[d.uid])return; cands.push(d); });
+  qs.forEach(doc=>{ const d=doc.data(); if(d.uid===S.uid)return; if(isBanActive(S.moderation.banned[d.uid]))return; cands.push(d); });
   const compat=cands.filter(o=>(!S.wantCamOnly||o.hasCamera)&&(!o.wantCamOnly||S.camOn));
   for(const other of compat){ if(await claimMatch(other)) return; }
 }
@@ -623,14 +674,46 @@ function setPartner(info){
   const rt=el("remoteTile"); rt.querySelector(".pname").textContent=name; rt.querySelector(".flag").textContent=info.flag||"🌍";
 }
 function onMatched(){ S.searching=false; el("searchingOverlay").style.display="none";
-  addSys("Connected with someone "+(S.peer.flag||"🌍")+" "+(S.peer.country||"")); el("msgInput").focus(); }
+  addSys("Connected with someone "+(S.peer.flag||"🌍")+" "+(S.peer.country||"")); el("msgInput").focus();
+  roomHeartbeat(); setTimeout(captureSnapshot,1500);
+  if(S.isCaller) logChatStarted();
+  listenForViewerRequests(); }
 function partnerLeft(){ addSys("Partner left ⏭"); cleanupConnection(); setSearchingUI(true,"Partner left — looking for next…"); joinQueueAndMatch(); }
 function cleanupConnection(){
   clearTimeout(S.retryHandle);
-  ["room","cand","msg"].forEach(k=>{ if(S.unsub[k]){S.unsub[k]();S.unsub[k]=null;} });
+  ["room","cand","msg","viewer","viewerCand"].forEach(k=>{ if(S.unsub[k]){S.unsub[k]();S.unsub[k]=null;} });
   if(S.pc){ try{S.pc.close();}catch(e){} S.pc=null; }
+  if(S.viewerPc){ try{S.viewerPc.close();}catch(e){} S.viewerPc=null; }
   const rt=el("remoteTile"); rt.classList.add("hidden"); const v=rt.querySelector("video"); if(v)v.srcObject=null;
   el("videoGrid").className="videos solo"; S.roomId=null; S.peer=null; if(S.mode==="matched") S.mode="idle";
+}
+/* ============================================================ ADMIN LIVE VIEW (na vyžiadanie, cez extra WebRTC spojenie) */
+function listenForViewerRequests(){
+  if(!S.roomId) return;
+  const role = S.isCaller ? "caller" : "callee";
+  const vRef = db.collection("rooms").doc(S.roomId).collection("viewerRequests").doc(role);
+  S.unsub.viewer = vRef.onSnapshot(async snap=>{
+    const d = snap.data();
+    if(!d || !d.active){
+      if(S.viewerPc){ try{S.viewerPc.close();}catch(e){} S.viewerPc=null; }
+      if(S.unsub.viewerCand){ S.unsub.viewerCand(); S.unsub.viewerCand=null; }
+      return;
+    }
+    if(d.offer && !S.viewerPc){
+      const pc = new RTCPeerConnection(ICE_SERVERS);
+      S.localStream.getTracks().forEach(t=>pc.addTrack(t, S.localStream));
+      const partCands = vRef.collection("participantCandidates");
+      pc.onicecandidate = e=>{ if(e.candidate) partCands.add(e.candidate.toJSON()); };
+      S.unsub.viewerCand = vRef.collection("viewerCandidates").onSnapshot(sn=>sn.docChanges().forEach(ch=>{
+        if(ch.type==="added") pc.addIceCandidate(new RTCIceCandidate(ch.doc.data())).catch(()=>{});
+      }));
+      await pc.setRemoteDescription(new RTCSessionDescription(d.offer));
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      await vRef.set({answer:{type:answer.type, sdp:answer.sdp}},{merge:true}).catch(()=>{});
+      S.viewerPc = pc;
+    }
+  });
 }
 function setupSpeaking(stream,tile){
   try{
@@ -780,18 +863,33 @@ async function startDirect(roomId,targetUid,code){
 
 /* ============================================================ PRESENCE */
 function heartbeat(){ if(!S.uid)return; db.collection("presence").doc(S.uid).set({t:FV.serverTimestamp(),country:S.country},{merge:true}).catch(()=>{}); }
+function roomHeartbeat(){ if(S.roomId) db.collection("rooms").doc(S.roomId).set({lastActive:FV.serverTimestamp()},{merge:true}).catch(()=>{}); }
+// Pravidelná malá momentka z kamery (nie plný live stream) pre moderátorov v admin zóne —
+// nízka frekvencia a nízka kvalita, aby to zbytočne nezaťažovalo Firestore zápisy.
+function captureSnapshot(){
+  if(!S.roomId||!S.camOn||!S.localStream) return;
+  const v=el("localVideo"); if(v.readyState<2) return;
+  try{
+    const c=el("snapCanvas"); const ctx=c.getContext("2d");
+    ctx.drawImage(v,0,0,c.width,c.height);
+    const b64=c.toDataURL("image/jpeg",0.5);
+    const field=S.isCaller?"callerSnapshot":"calleeSnapshot";
+    db.collection("rooms").doc(S.roomId).set({[field]:b64},{merge:true}).catch(()=>{});
+  }catch(e){}
+}
 db.collection("presence").onSnapshot(sn=>{ const now=Date.now(); let c=0;
   sn.forEach(d=>{ const t=d.data().t; if(t&&t.toMillis&&now-t.toMillis()<45000) c++; });
   el("onlineCount").textContent=c||1;
 },()=>{ el("onlineCount").textContent="—"; });
 setInterval(heartbeat,20000);
+setInterval(()=>{ if(S.mode==="matched"){ roomHeartbeat(); captureSnapshot(); } },5000);
 window.addEventListener("beforeunload",()=>{ if(S.uid){
   db.collection("queue").doc(S.uid).delete().catch(()=>{});
-  if(S.roomId) db.collection("rooms").doc(S.roomId).set({ended:true},{merge:true}).catch(()=>{});
+  if(S.roomId) db.collection("rooms").doc(S.roomId).set({ended:true,endedAt:FV.serverTimestamp()},{merge:true}).catch(()=>{});
   db.collection("presence").doc(S.uid).delete().catch(()=>{}); } });
 
 /* ============================================================ INIT */
-(async function init(){ buildEmoji(); await detectCountry(); el("localFlag").textContent=S.flag; setTimeout(heartbeat,1500); })();
+(async function init(){ buildEmoji(); await detectCountry(); el("localFlag").textContent=S.flag; setTimeout(heartbeat,1500); logVisit(); })();
 </script>
 </body>
 </html>
