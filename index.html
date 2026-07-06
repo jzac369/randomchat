@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>NEBULA · náhodný video chat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0819; --bg2:#0f0b24; --panel:#16123059; --panel-solid:#171334;
+  --line:#2a2350; --line-soft:#221d43;
+  --violet:#8b5cf6; --violet-2:#a855f7; --blue:#3b82f6; --cyan:#22d3ee;
+  --text:#ece9ff; --muted:#9089b8; --muted-2:#6f6a93;
+  --green:#34d399; --amber:#fbbf24; --red:#fb5b6b;
+  --grad:linear-gradient(120deg,#7c3aed,#4f46e5 55%,#2563eb);
+  --grad-soft:linear-gradient(120deg,#8b5cf6,#22d3ee);
+  --radius:20px; --radius-sm:13px;
+  --shadow:0 24px 60px -22px rgba(80,40,180,.55);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  font-family:Inter,system-ui,sans-serif;color:var(--text);
+  background:
+    radial-gradient(1100px 700px at 12% -8%, #241a5e33, transparent 60%),
+    radial-gradient(900px 600px at 100% 8%, #0e5ca833, transparent 55%),
+    radial-gradient(800px 800px at 50% 120%, #6d28d926, transparent 60%),
+    var(--bg);
+  -webkit-font-smoothing:antialiased;overflow:hidden;
+}
+h1,h2,h3,.brand,.big{font-family:"Space Grotesk",sans-serif}
+button{font-family:inherit;cursor:pointer;border:0;color:inherit}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:#332b5e;border-radius:20px}
+::-webkit-scrollbar-track{background:transparent}
+.hidden{display:none !important}
+
+#app{height:100%;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--line-soft);backdrop-filter:blur(8px)}
+.brand{display:flex;align-items:center;gap:11px;font-weight:700;font-size:19px;letter-spacing:.3px}
+.brand .orb{width:30px;height:30px;border-radius:50%;background:conic-gradient(from 180deg,#22d3ee,#8b5cf6,#3b82f6,#22d3ee);box-shadow:0 0 22px #8b5cf6aa;animation:spin 7s linear infinite;position:relative;flex:0 0 auto}
+.brand .orb::after{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--bg)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.brand b{background:var(--grad-soft);-webkit-background-clip:text;background-clip:text;color:transparent}
+.topbar .spacer{flex:1}
+.pill{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--muted);background:#ffffff08;border:1px solid var(--line);padding:7px 12px;border-radius:999px}
+.pill .dot{width:8px;height:8px;border-radius:50%;background:var(--muted-2)}
+.pill.live .dot{background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.35}}
+.ghost-btn{background:#ffffff0a;border:1px solid var(--line);color:var(--text);padding:9px 15px;border-radius:11px;font-weight:600;font-size:13.5px;transition:.15s}
+.ghost-btn:hover{background:#ffffff14;border-color:#3a2f6e}
+
+.view{flex:1;min-height:0;display:flex;overflow:hidden}
+.view.center{align-items:center;justify-content:center;padding:24px}
+.hero{max-width:920px;width:100%;text-align:center;animation:rise .6s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}}
+.hero .eyebrow{color:var(--cyan);font-weight:600;letter-spacing:3px;font-size:12px;text-transform:uppercase}
+.hero h1{font-size:clamp(34px,6vw,62px);margin:14px 0 6px;line-height:1.02;font-weight:700}
+.hero h1 span{background:var(--grad-soft);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{color:var(--muted);font-size:clamp(15px,2vw,18px);max-width:560px;margin:0 auto 30px}
+.start-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:26px;max-width:520px;margin:0 auto;backdrop-filter:blur(14px);box-shadow:var(--shadow)}
+.opts{display:flex;flex-direction:column;gap:12px;margin-bottom:22px;text-align:left}
+.opt-row{display:flex;align-items:center;gap:13px;padding:13px 15px;border:1px solid var(--line);border-radius:var(--radius-sm);background:#ffffff05}
+.opt-row .ico{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:19px;background:#ffffff0a;flex:0 0 auto}
+.opt-row .txt{flex:1}
+.opt-row .txt b{display:block;font-size:14.5px}
+.opt-row .txt small{color:var(--muted);font-size:12.5px}
+.switch{position:relative;width:46px;height:26px;flex:0 0 auto}
+.switch input{display:none}
+.switch label{position:absolute;inset:0;background:#2b2552;border-radius:999px;transition:.2s;cursor:pointer}
+.switch label::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.switch input:checked + label{background:var(--grad)}
+.switch input:checked + label::after{transform:translateX(20px)}
+.btn-primary{width:100%;padding:16px;border-radius:14px;font-family:"Space Grotesk";font-weight:700;font-size:17px;background:var(--grad);color:#fff;box-shadow:0 14px 32px -10px #6d28d9cc;transition:.15s;position:relative;overflow:hidden}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 20px 40px -12px #6d28d9}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.auth-links{margin-top:16px;font-size:13.5px;color:var(--muted)}
+.auth-links a{color:var(--cyan);text-decoration:none;font-weight:600;cursor:pointer}
+.auth-links a:hover{text-decoration:underline}
+.feature-strip{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+.feature-strip span{font-size:12.5px;color:var(--muted);background:#ffffff08;border:1px solid var(--line-soft);padding:6px 12px;border-radius:999px}
+.age-note{margin-top:16px;font-size:11.5px;color:var(--muted-2)}
+
+.stage{display:grid;grid-template-columns:1fr 380px;width:100%;gap:0}
+.video-wrap{position:relative;background:#08061a;overflow:hidden;display:flex;flex-direction:column}
+.videos{flex:1;position:relative;display:grid;gap:10px;padding:12px}
+.videos.solo{grid-template-columns:1fr}
+.videos.duo{grid-template-columns:1fr 1fr}
+.vtile{position:relative;border-radius:16px;overflow:hidden;background:#0c0a20;border:1px solid var(--line);min-height:120px}
+.vtile video{width:100%;height:100%;object-fit:cover;display:block;background:#0c0a20}
+.vtile.speaking{border-color:var(--cyan);box-shadow:0 0 0 2px var(--cyan),0 0 26px #22d3ee55}
+.vtile .label{position:absolute;left:10px;bottom:10px;display:flex;align-items:center;gap:7px;background:#0a0819cc;backdrop-filter:blur(6px);padding:6px 11px;border-radius:10px;font-size:12.5px;font-weight:600;border:1px solid var(--line)}
+.vtile .flag{font-size:16px;line-height:1}
+.vtile .mut{position:absolute;right:10px;top:10px;background:#0a0819cc;border-radius:9px;padding:5px 7px;font-size:12px;border:1px solid var(--line)}
+.vtile.local .label{background:#7c3aedcc;border-color:#a855f7}
+.vtile .placeholder{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted-2);font-size:13px;text-align:center;padding:20px}
+.searching{position:absolute;inset:0;display:grid;place-items:center;text-align:center;pointer-events:none}
+.searching .radar{width:120px;height:120px;border-radius:50%;border:2px solid #2a2350;position:relative;margin:0 auto 18px}
+.searching .radar::before{content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid transparent;border-top-color:var(--cyan);animation:spin 1.1s linear infinite}
+.searching .radar::after{content:"";position:absolute;inset:24px;border-radius:50%;background:radial-gradient(circle,#8b5cf6,transparent 70%);animation:pulse 1.4s infinite}
+.searching h3{margin:0 0 4px;font-size:18px}
+.searching p{color:var(--muted);margin:0;font-size:13.5px}
+.controls{display:flex;align-items:center;gap:10px;padding:12px 14px;border-top:1px solid var(--line-soft);background:#0c0a1eaa;backdrop-filter:blur(10px);flex-wrap:wrap}
+.cbtn{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:20px;background:#ffffff0d;border:1px solid var(--line);transition:.15s}
+.cbtn:hover{background:#ffffff18}
+.cbtn.off{background:#fb5b6b22;border-color:#fb5b6b66;color:#ffb4bc}
+.next-btn{flex:1;min-width:150px;height:48px;border-radius:14px;font-family:"Space Grotesk";font-weight:700;font-size:16px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 12px 26px -12px #6d28d9;transition:.15s}
+.next-btn:hover{transform:translateY(-1px)}
+.next-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.stop-btn{width:48px;height:48px;border-radius:14px;background:#fb5b6b1c;border:1px solid #fb5b6b55;color:#ff9ba6;display:grid;place-items:center;font-size:19px}
+
+.chat-panel{display:flex;flex-direction:column;border-left:1px solid var(--line-soft);background:var(--bg2);min-height:0}
+.chat-head{padding:14px 16px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:10px}
+.chat-head .peer-ava{width:34px;height:34px;border-radius:11px;background:var(--grad);display:grid;place-items:center;font-weight:700;font-size:14px}
+.chat-head .meta{flex:1;min-width:0}
+.chat-head .meta b{font-size:14.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-head .meta small{color:var(--muted);font-size:12px;display:flex;align-items:center;gap:5px}
+.chat-head .rep{font-size:12px;color:var(--muted);background:#ffffff0a;border:1px solid var(--line);padding:6px 10px;border-radius:9px}
+.chat-head .rep:hover{color:var(--red);border-color:#fb5b6b55}
+.messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:82%;padding:9px 13px;border-radius:14px;font-size:14px;line-height:1.45;word-wrap:break-word;overflow-wrap:anywhere;animation:pop .18s ease}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}}
+.msg.them{align-self:flex-start;background:#1d1840;border:1px solid var(--line);border-bottom-left-radius:5px}
+.msg.me{align-self:flex-end;background:var(--grad);border-bottom-right-radius:5px}
+.msg.sys{align-self:center;background:transparent;color:var(--muted-2);font-size:12px;text-align:center;max-width:100%}
+.msg .voice{display:flex;align-items:center;gap:10px;min-width:170px}
+.msg .voice button{width:34px;height:34px;border-radius:50%;background:#ffffff22;display:grid;place-items:center;font-size:15px;flex:0 0 auto}
+.msg .voice .bars{flex:1;height:22px;display:flex;align-items:center;gap:2px}
+.msg .voice .bars i{flex:1;background:#ffffff66;border-radius:2px;height:40%}
+.msg .voice .dur{font-size:11px;opacity:.85;font-variant-numeric:tabular-nums}
+.msg .flt{color:var(--amber);font-style:italic;font-size:11.5px}
+.chat-empty{margin:auto;text-align:center;color:var(--muted-2);font-size:13px;padding:30px}
+.composer{padding:11px 12px;border-top:1px solid var(--line-soft);display:flex;flex-direction:column;gap:8px}
+.emoji-bar{display:flex;gap:2px;flex-wrap:wrap;max-height:0;overflow:hidden;transition:max-height .25s}
+.emoji-bar.open{max-height:170px;overflow-y:auto;padding-bottom:4px}
+.emoji-bar button{width:34px;height:34px;border-radius:9px;font-size:19px;background:transparent}
+.emoji-bar button:hover{background:#ffffff14}
+.emoji-cat{width:100%;font-size:10.5px;color:var(--muted-2);text-transform:uppercase;letter-spacing:1px;padding:6px 4px 2px}
+.composer-row{display:flex;align-items:flex-end;gap:8px}
+.icon-btn{width:40px;height:40px;border-radius:11px;background:#ffffff0a;border:1px solid var(--line);display:grid;place-items:center;font-size:18px;flex:0 0 auto;transition:.15s}
+.icon-btn:hover{background:#ffffff16}
+.icon-btn.rec{background:#fb5b6b;border-color:#fb5b6b;color:#fff;animation:pulse 1s infinite}
+.composer textarea{flex:1;resize:none;background:#ffffff0a;border:1px solid var(--line);border-radius:12px;color:var(--text);padding:11px 13px;font-family:inherit;font-size:14px;max-height:110px;min-height:42px;line-height:1.4;outline:none}
+.composer textarea:focus{border-color:#4b3f8c}
+.send-btn{width:44px;height:44px;border-radius:12px;background:var(--grad);display:grid;place-items:center;font-size:18px;flex:0 0 auto}
+.send-btn:disabled{opacity:.45}
+.rec-ui{display:none;align-items:center;gap:12px;background:#fb5b6b18;border:1px solid #fb5b6b55;border-radius:12px;padding:8px 12px;font-size:13px}
+.rec-ui.on{display:flex}
+.rec-ui .rdot{width:11px;height:11px;border-radius:50%;background:var(--red);animation:pulse .8s infinite}
+.rec-ui .rtime{font-variant-numeric:tabular-nums;font-weight:600}
+.rec-ui .cancel{margin-left:auto;color:var(--muted);font-size:12px}
+.rec-ui .cancel:hover{color:var(--red)}
+
+.modal-back{position:fixed;inset:0;background:#05040fcc;backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+.modal-back.open{display:flex}
+.modal{background:var(--panel-solid);border:1px solid var(--line);border-radius:var(--radius);padding:26px;max-width:420px;width:100%;box-shadow:var(--shadow);animation:rise .3s ease both;position:relative}
+.modal h2{margin:0 0 4px;font-size:22px}
+.modal p.m-sub{color:var(--muted);font-size:13.5px;margin:0 0 20px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px;font-weight:600}
+.field input{width:100%;background:#ffffff08;border:1px solid var(--line);border-radius:11px;color:var(--text);padding:12px 13px;font-size:14.5px;font-family:inherit;outline:none}
+.field input:focus{border-color:#4b3f8c}
+.modal .btn-primary{margin-top:6px}
+.modal-close{position:absolute;top:16px;right:18px;background:none;color:var(--muted);font-size:22px}
+.modal-err{color:var(--red);font-size:13px;margin-top:10px;min-height:16px}
+.code-badge{background:var(--grad);border-radius:14px;padding:16px;text-align:center;margin:6px 0 18px;font-family:"Space Grotesk"}
+.code-badge small{display:block;font-size:11px;opacity:.85;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.code-badge b{font-size:30px;letter-spacing:4px}
+
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(30px);opacity:0;background:#171334;border:1px solid var(--line);padding:12px 18px;border-radius:12px;font-size:13.5px;z-index:60;transition:.3s;box-shadow:var(--shadow);max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.err{border-color:#fb5b6b66}
+.toast.ok{border-color:#34d39966}
+
+@media(max-width:880px){
+  .stage{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}
+  .chat-panel{border-left:0;border-top:1px solid var(--line-soft);max-height:44vh}
+  .videos.duo{grid-template-columns:1fr;grid-template-rows:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div class="brand"><span class="orb"></span> NE<b>BULA</b></div>
+    <span class="pill live" id="onlinePill"><span class="dot"></span><span id="onlineCount">—</span> online</span>
+    <div class="spacer"></div>
+    <span class="pill" id="userPill"><span class="dot"></span><span id="userPillText">Hosť</span></span>
+    <button class="ghost-btn" id="accountBtn">Účet</button>
+  </div>
+
+  <!-- LANDING -->
+  <div class="view center" id="landingView">
+    <div class="hero">
+      <div class="eyebrow">Náhodné spojenia · bez registrácie</div>
+      <h1>Stretni <span>niekoho nového</span><br>za jediné kliknutie</h1>
+      <p class="sub">Zapneš kameru, stlačíš tlačidlo a systém ťa spojí s náhodným človekom. Nepáči sa? Ďalší je vzdialený jedno „Ďalej“.</p>
+      <div class="start-card">
+        <div class="opts">
+          <div class="opt-row">
+            <div class="ico">🎥</div>
+            <div class="txt"><b>Zapnúť kameru a mikrofón</b><small>Video chat naživo cez WebRTC</small></div>
+            <div class="switch"><input type="checkbox" id="optCam" checked><label for="optCam"></label></div>
+          </div>
+          <div class="opt-row">
+            <div class="ico">📹</div>
+            <div class="txt"><b>Len ľudia so zapnutou kamerou</b><small>Spájať iba s tými, čo majú video</small></div>
+            <div class="switch"><input type="checkbox" id="optCamOnly"><label for="optCamOnly"></label></div>
+          </div>
+        </div>
+        <button class="btn-primary" id="startBtn">Spustiť náhodný chat</button>
+        <div class="auth-links">
+          <a id="loginLink">Prihlásiť sa</a> alebo <a id="registerLink">vytvoriť účet</a> · pre direct chat cez kód
+        </div>
+        <div class="age-note">Stlačením súhlasíš, že máš 18+ a budeš dodržiavať slušné správanie. Chat je moderovaný.</div>
+      </div>
+      <div class="feature-strip">
+        <span>😊 Emotikony</span><span>🎙️ Hlasové správy do 1 min</span><span>🌍 Krajina partnera</span><span>🛡️ Moderovaný chat</span><span>🔑 Direct chat cez kód</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="view hidden" id="chatView">
+    <div class="stage">
+      <div class="video-wrap">
+        <div class="videos solo" id="videoGrid">
+          <div class="vtile local">
+            <video id="localVideo" autoplay muted playsinline></video>
+            <div class="placeholder" id="localPlaceholder">Kamera je vypnutá</div>
+            <div class="label"><span class="flag" id="localFlag">🌍</span> Ty</div>
+            <div class="mut hidden" id="localMuteBadge">🔇</div>
+          </div>
+          <div class="vtile remote hidden" id="remoteTile">
+            <video autoplay playsinline></video>
+            <div class="placeholder">Bez videa</div>
+            <div class="label"><span class="flag">🌍</span><span class="pname">Neznámy</span></div>
+          </div>
+          <div class="searching" id="searchingOverlay">
+            <div class="radar"></div>
+            <h3>Hľadám niekoho…</h3>
+            <p id="searchingSub">Prepájam ťa s náhodným účastníkom</p>
+          </div>
+        </div>
+        <div class="controls">
+          <button class="cbtn" id="camToggle" title="Kamera">🎥</button>
+          <button class="cbtn" id="micToggle" title="Mikrofón">🎙️</button>
+          <button class="next-btn" id="nextBtn">⏭ Ďalej</button>
+          <button class="stop-btn" id="stopBtn" title="Ukončiť">⏹</button>
+        </div>
+      </div>
+      <div class="chat-panel">
+        <div class="chat-head">
+          <div class="peer-ava" id="peerAva">?</div>
+          <div class="meta">
+            <b id="peerName">Čakám na spojenie…</b>
+            <small><span class="flag" id="peerFlag">🌍</span><span id="peerCountry">—</span></small>
+          </div>
+          <button class="rep" id="reportBtn" title="Nahlásiť a preskočiť">🚩 Nahlásiť</button>
+        </div>
+        <div class="messages" id="messages">
+          <div class="chat-empty" id="chatEmpty">Správy sa zobrazia tu.<br>Buď slušný — chat je moderovaný. 💜</div>
+        </div>
+        <div class="composer">
+          <div class="rec-ui" id="recUi">
+            <span class="rdot"></span><span>Nahrávam</span><span class="rtime" id="recTime">0:00</span>
+            <span style="color:var(--muted);font-size:12px">/ max 1:00</span>
+            <button class="cancel" id="recCancel">Zrušiť</button>
+          </div>
+          <div class="emoji-bar" id="emojiBar"></div>
+          <div class="composer-row" id="composerRow">
+            <button class="icon-btn" id="emojiToggle" title="Emotikony">😊</button>
+            <button class="icon-btn" id="voiceBtn" title="Nahrať hlasovú správu">🎙️</button>
+            <textarea id="msgInput" rows="1" placeholder="Napíš správu…"></textarea>
+            <button class="send-btn" id="sendBtn" disabled>➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-back" id="authModal">
+  <div class="modal">
+    <button class="modal-close" id="authClose">×</button>
+    <h2 id="authTitle">Prihlásenie</h2>
+    <p class="m-sub" id="authSub">Prihlás sa pre direct chat cez kód.</p>
+    <div class="field"><label>E-mail</label><input type="email" id="authEmail" placeholder="ty@email.sk" autocomplete="email"></div>
+    <div class="field"><label>Heslo</label><input type="password" id="authPass" placeholder="••••••••" autocomplete="current-password"></div>
+    <button class="btn-primary" id="authSubmit">Prihlásiť sa</button>
+    <div class="modal-err" id="authErr"></div>
+    <div class="auth-links" style="text-align:center"><a id="authSwitch">Nemáš účet? Zaregistruj sa</a></div>
+  </div>
+</div>
+
+<!-- ACCOUNT MODAL -->
+<div class="modal-back" id="accountModal">
+  <div class="modal">
+    <button class="modal-close" id="accountClose">×</button>
+    <h2>Tvoj účet</h2>
+    <p class="m-sub" id="accountEmail">—</p>
+    <div class="code-badge"><small>Tvoj kontaktný kód</small><b id="accountCode">------</b></div>
+    <p class="m-sub" style="margin-bottom:14px">Zdieľaj tento kód a ktokoľvek s účtom ťa môže priamo osloviť.</p>
+    <div class="field"><label>Pripojiť sa cez kód (direct chat)</label><input id="connectCode" placeholder="napr. NB-4F7B2K" style="text-transform:uppercase"></div>
+    <button class="btn-primary" id="directConnectBtn">Nadviazať direct chat</button>
+    <div class="modal-err" id="accountErr"></div>
+    <div class="auth-links" style="text-align:center;margin-top:14px"><a id="logoutLink">Odhlásiť sa</a></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="config.js"></script>
+<script>
+/* ============================================================
+   NEBULA — náhodný video/text chat (v1.0.0)
+   Firebase (Spark) signaling + WebRTC P2P.
+   Konfigurácia sa načítava z config.js
+   ============================================================ */
+firebase.initializeApp(FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const FV = firebase.firestore.FieldValue;
+
+const S = {
+  uid:null, isRegistered:false, email:null, myCode:null,
+  country:"Neznáma", flag:"🌍", countryCode:"",
+  localStream:null, camOn:true, micOn:true, wantCamOnly:false,
+  pc:null, roomId:null, isCaller:false, peer:null, mode:"idle",
+  unsub:{}, searching:false, recorder:null, recChunks:[], recTimer:null, recStart:0, recCancelled:false,
+  moderation:{keywords:[], banned:{}}, retryHandle:null
+};
+
+const el = id => document.getElementById(id);
+function toast(msg,type=""){ const t=el("toast"); t.textContent=msg; t.className="toast show "+type; clearTimeout(t._t); t._t=setTimeout(()=>t.className="toast",3200); }
+function genCode(){ const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s=""; for(let i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)]; return "NB-"+s; }
+function esc(s){ return (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function flagOf(cc){ if(!cc||cc.length!==2) return "🌍"; return String.fromCodePoint(...[...cc.toUpperCase()].map(c=>127397+c.charCodeAt(0))); }
+function fmtTime(s){ s=Math.max(0,Math.round(s)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+
+/* ---------- geo-IP (bez servera) ---------- */
+async function detectCountry(){
+  const providers=[
+    async()=>{const r=await fetch("https://ipapi.co/json/");const j=await r.json();return{name:j.country_name,code:j.country_code};},
+    async()=>{const r=await fetch("https://ipwho.is/");const j=await r.json();return{name:j.country,code:j.country_code};},
+    async()=>{const r=await fetch("https://get.geojs.io/v1/ip/country.json");const j=await r.json();return{name:j.name,code:j.country};}
+  ];
+  for(const p of providers){
+    try{ const g=await Promise.race([p(),new Promise((_,x)=>setTimeout(()=>x("t"),4000))]);
+      if(g&&g.code){ S.country=g.name||g.code; S.countryCode=g.code; S.flag=flagOf(g.code); return; } }catch(e){}
+  }
+}
+
+/* ============================================================ AUTH */
+auth.onAuthStateChanged(async user=>{
+  if(!user){ await auth.signInAnonymously().catch(e=>toast("Chyba prihlásenia: "+e.message,"err")); return; }
+  S.uid=user.uid; S.isRegistered=!user.isAnonymous; S.email=user.email;
+  if(S.isRegistered) await ensureUserCode();
+  updateUserPill();
+});
+async function ensureUserCode(){
+  const ref=db.collection("users").doc(S.uid);
+  const snap=await ref.get();
+  if(snap.exists && snap.data().code){ S.myCode=snap.data().code; return; }
+  let code,ok=false,tries=0;
+  while(!ok&&tries<8){ code=genCode();
+    try{ await db.collection("codes").doc(code).set({uid:S.uid,createdAt:FV.serverTimestamp()}); ok=true; }
+    catch(e){ tries++; } }
+  S.myCode=code;
+  await ref.set({email:S.email,code,createdAt:FV.serverTimestamp()},{merge:true});
+}
+function updateUserPill(){
+  el("userPillText").textContent = S.isRegistered ? (S.email?.split("@")[0]||"Člen") : "Hosť";
+  el("userPill").querySelector(".dot").style.background = S.isRegistered ? "var(--green)" : "var(--muted-2)";
+}
+
+let authMode="login";
+function openAuth(mode){ authMode=mode; el("authModal").classList.add("open");
+  el("authTitle").textContent=mode==="login"?"Prihlásenie":"Vytvoriť účet";
+  el("authSub").textContent=mode==="login"?"Prihlás sa pre direct chat cez kód.":"Získaš vlastný kód pre priame kontakty.";
+  el("authSubmit").textContent=mode==="login"?"Prihlásiť sa":"Zaregistrovať sa";
+  el("authSwitch").textContent=mode==="login"?"Nemáš účet? Zaregistruj sa":"Už máš účet? Prihlás sa";
+  el("authErr").textContent=""; }
+el("loginLink").onclick=()=>openAuth("login");
+el("registerLink").onclick=()=>openAuth("register");
+el("authSwitch").onclick=()=>openAuth(authMode==="login"?"register":"login");
+el("authClose").onclick=()=>el("authModal").classList.remove("open");
+el("authSubmit").onclick=async()=>{
+  const email=el("authEmail").value.trim(), pass=el("authPass").value;
+  if(!email||pass.length<6){ el("authErr").textContent="Zadaj e-mail a heslo (min. 6 znakov)."; return; }
+  el("authSubmit").disabled=true;
+  try{
+    if(authMode==="register"){
+      const emailCred=firebase.auth.EmailAuthProvider.credential(email,pass);
+      try{ await auth.currentUser.linkWithCredential(emailCred); }
+      catch(e){ if(e.code==="auth/email-already-in-use") await auth.signInWithEmailAndPassword(email,pass); else throw e; }
+    } else { await auth.signInWithEmailAndPassword(email,pass); }
+    el("authModal").classList.remove("open"); toast("Vitaj! 💜","ok");
+  }catch(e){ el("authErr").textContent=mapAuthErr(e.code)||e.message; }
+  el("authSubmit").disabled=false;
+};
+function mapAuthErr(c){ return ({
+  "auth/invalid-email":"Neplatný e-mail.","auth/wrong-password":"Nesprávne heslo.",
+  "auth/user-not-found":"Účet neexistuje.","auth/email-already-in-use":"E-mail sa už používa — skús sa prihlásiť.",
+  "auth/weak-password":"Heslo je príliš slabé.","auth/invalid-credential":"Nesprávny e-mail alebo heslo."}[c]); }
+
+el("accountBtn").onclick=()=>{ if(!S.isRegistered){ openAuth("login"); return; }
+  el("accountEmail").textContent=S.email; el("accountCode").textContent=S.myCode||"------"; el("accountModal").classList.add("open"); };
+el("accountClose").onclick=()=>el("accountModal").classList.remove("open");
+el("logoutLink").onclick=async()=>{ await auth.signOut(); location.reload(); };
+
+/* ============================================================ MODERATION */
+db.collection("config").doc("moderation").onSnapshot(snap=>{
+  const d=snap.data()||{};
+  S.moderation.keywords=(d.blockedKeywords||[]).map(k=>k.toLowerCase());
+  S.moderation.banned=d.bannedUsers||{};
+  if(S.uid&&S.moderation.banned[S.uid]) handleBanned();
+},()=>{});
+function handleBanned(){ cleanupConnection(); leaveQueue(); showView("landing");
+  toast("Tvoj prístup bol zablokovaný moderátorom.","err");
+  el("startBtn").disabled=true; el("startBtn").textContent="Prístup zablokovaný"; }
+function filterText(txt){ let flagged=false,out=txt;
+  for(const kw of S.moderation.keywords){ if(!kw)continue;
+    const re=new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi");
+    if(re.test(out)){ flagged=true; out=out.replace(re,m=>"*".repeat(m.length)); } }
+  return {out,flagged}; }
+
+/* ============================================================ MEDIA */
+async function getMedia(){
+  if(S.localStream) return S.localStream;
+  try{
+    S.localStream=await navigator.mediaDevices.getUserMedia({ video:S.camOn?{width:{ideal:1280},height:{ideal:720}}:false, audio:true });
+  }catch(e){
+    try{ S.localStream=await navigator.mediaDevices.getUserMedia({video:false,audio:true}); S.camOn=false; }
+    catch(e2){ toast("Nepodarilo sa získať kameru/mikrofón. Skontroluj povolenia prehliadača.","err"); throw e2; }
+  }
+  el("localVideo").srcObject=S.localStream; reflectMediaButtons(); return S.localStream;
+}
+function reflectMediaButtons(){
+  const vt=S.localStream?.getVideoTracks?.()[0], at=S.localStream?.getAudioTracks?.()[0];
+  S.camOn=!!(vt&&vt.enabled); S.micOn=!!(at&&at.enabled);
+  el("camToggle").classList.toggle("off",!S.camOn); el("micToggle").classList.toggle("off",!S.micOn);
+  el("camToggle").textContent=S.camOn?"🎥":"📷"; el("micToggle").textContent=S.micOn?"🎙️":"🔇";
+  el("localPlaceholder").classList.toggle("hidden",S.camOn); el("localMuteBadge").classList.toggle("hidden",S.micOn);
+}
+el("camToggle").onclick=()=>{ const t=S.localStream?.getVideoTracks?.()[0]; if(!t){toast("Kamera nie je dostupná.");return;} t.enabled=!t.enabled; reflectMediaButtons(); updateQueueFlags(); };
+el("micToggle").onclick=()=>{ const t=S.localStream?.getAudioTracks?.()[0]; if(!t)return; t.enabled=!t.enabled; reflectMediaButtons(); };
+
+/* ============================================================ VIEWS */
+function showView(v){ el("landingView").classList.toggle("hidden",v!=="landing"); el("chatView").classList.toggle("hidden",v!=="chat"); }
+
+/* ============================================================ PAIRING */
+el("startBtn").onclick=async()=>{
+  S.camOn=el("optCam").checked; S.wantCamOnly=el("optCamOnly").checked;
+  el("startBtn").disabled=true;
+  try{ await getMedia(); }catch(e){ el("startBtn").disabled=false; return; }
+  el("localFlag").textContent=S.flag; showView("chat"); el("startBtn").disabled=false; startSearch();
+};
+el("nextBtn").onclick=()=>nextPartner();
+el("stopBtn").onclick=()=>{ cleanupConnection(); leaveQueue(); showView("landing"); };
+
+function setSearchingUI(on,sub){
+  S.searching=on; el("searchingOverlay").style.display=on?"grid":"none"; el("nextBtn").disabled=on;
+  if(sub) el("searchingSub").textContent=sub;
+  if(on){ el("peerName").textContent="Hľadám niekoho…"; el("peerCountry").textContent="—"; el("peerFlag").textContent="🌍"; el("peerAva").textContent="?"; el("remoteTile").classList.add("hidden"); el("videoGrid").className="videos solo"; clearMessages(); }
+}
+async function startSearch(){ cleanupConnection(); setSearchingUI(true); await joinQueueAndMatch(); }
+async function nextPartner(){
+  if(S.searching) return;
+  if(S.roomId) db.collection("rooms").doc(S.roomId).set({ended:true,endedAt:FV.serverTimestamp()},{merge:true}).catch(()=>{});
+  cleanupConnection(); setSearchingUI(true,"Hľadám ďalšieho…"); await joinQueueAndMatch();
+}
+function myQueueDoc(){ return { uid:S.uid,createdAt:FV.serverTimestamp(),matched:false,roomId:null,
+  hasCamera:!!S.camOn,wantCamOnly:!!S.wantCamOnly,country:S.country,countryCode:S.countryCode,flag:S.flag,
+  isRegistered:S.isRegistered,v:APP_VERSION }; }
+function updateQueueFlags(){ if(S.mode==="searching"&&S.uid) db.collection("queue").doc(S.uid).set({hasCamera:!!S.camOn},{merge:true}).catch(()=>{}); }
+async function leaveQueue(){ S.mode="idle"; try{ await db.collection("queue").doc(S.uid).delete(); }catch(e){} if(S.unsub.queue){S.unsub.queue();S.unsub.queue=null;} clearTimeout(S.retryHandle); }
+
+async function joinQueueAndMatch(){
+  S.mode="searching";
+  await db.collection("queue").doc(S.uid).set(myQueueDoc());
+  if(S.unsub.queue) S.unsub.queue();
+  S.unsub.queue=db.collection("queue").doc(S.uid).onSnapshot(async snap=>{
+    const d=snap.data(); if(!d) return;
+    if(d.matched&&d.roomId&&S.mode==="searching"){
+      S.mode="matched"; if(S.unsub.queue){S.unsub.queue();S.unsub.queue=null;}
+      await db.collection("queue").doc(S.uid).delete().catch(()=>{});
+      startAsCallee(d.roomId);
+    }
+  });
+  await tryFindMatch(); scheduleRetry();
+}
+function scheduleRetry(){ clearTimeout(S.retryHandle);
+  S.retryHandle=setTimeout(async()=>{ if(S.mode==="searching"){ await tryFindMatch(); scheduleRetry(); } },2500); }
+
+async function tryFindMatch(){
+  if(S.mode!=="searching") return;
+  let qs;
+  try{ qs=await db.collection("queue").where("matched","==",false).orderBy("createdAt","asc").limit(12).get(); }
+  catch(e){ qs=await db.collection("queue").where("matched","==",false).limit(12).get(); }
+  const cands=[];
+  qs.forEach(doc=>{ const d=doc.data(); if(d.uid===S.uid)return; if(S.moderation.banned[d.uid])return; cands.push(d); });
+  const compat=cands.filter(o=>(!S.wantCamOnly||o.hasCamera)&&(!o.wantCamOnly||S.camOn));
+  for(const other of compat){ if(await claimMatch(other.uid)) return; }
+}
+async function claimMatch(otherUid){
+  const roomId=[S.uid,otherUid].sort().join("__")+"__"+Date.now();
+  const myRef=db.collection("queue").doc(S.uid), otRef=db.collection("queue").doc(otherUid);
+  try{
+    const won=await db.runTransaction(async tx=>{
+      const [m,o]=await Promise.all([tx.get(myRef),tx.get(otRef)]);
+      if(!m.exists||!o.exists) return false;
+      if(m.data().matched||o.data().matched) return false;
+      tx.update(myRef,{matched:true,roomId}); tx.update(otRef,{matched:true,roomId}); return true;
+    });
+    if(!won) return false;
+    if(S.unsub.queue){S.unsub.queue();S.unsub.queue=null;}
+    S.mode="matched"; await db.collection("queue").doc(S.uid).delete().catch(()=>{});
+    const oSnap=await otRef.get(); const od=oSnap.exists?oSnap.data():{};
+    startAsCaller(roomId,od); return true;
+  }catch(e){ return false; }
+}
+
+/* ============================================================ WEBRTC */
+function newPC(){
+  const pc=new RTCPeerConnection(ICE_SERVERS);
+  S.localStream.getTracks().forEach(t=>pc.addTrack(t,S.localStream));
+  pc.ontrack=ev=>attachRemote(ev.streams[0]);
+  pc.onconnectionstatechange=()=>{ if(["failed"].includes(pc.connectionState)&&S.mode==="matched") addSys("Spojenie zlyhalo — skús Ďalej."); };
+  return pc;
+}
+function attachRemote(stream){
+  const tile=el("remoteTile"); tile.classList.remove("hidden");
+  tile.querySelector("video").srcObject=stream;
+  el("searchingOverlay").style.display="none"; el("videoGrid").className="videos duo"; el("nextBtn").disabled=false;
+  setupSpeaking(stream,tile);
+}
+async function startAsCaller(roomId,partnerInfo){
+  S.roomId=roomId; S.isCaller=true; setPartner(partnerInfo);
+  const roomRef=db.collection("rooms").doc(roomId);
+  await roomRef.set({ users:[S.uid,partnerInfo.uid||"?"],caller:S.uid,mode:"random",ended:false,createdAt:FV.serverTimestamp(),
+    callerInfo:selfInfo(), calleeInfo:{uid:partnerInfo.uid,country:partnerInfo.country,flag:partnerInfo.flag,countryCode:partnerInfo.countryCode,isRegistered:partnerInfo.isRegistered} });
+  S.pc=newPC();
+  const cc=roomRef.collection("callerCandidates");
+  S.pc.onicecandidate=e=>{ if(e.candidate) cc.add(e.candidate.toJSON()); };
+  const offer=await S.pc.createOffer(); await S.pc.setLocalDescription(offer);
+  await roomRef.set({offer:{type:offer.type,sdp:offer.sdp}},{merge:true});
+  S.unsub.room=roomRef.onSnapshot(snap=>{ const d=snap.data(); if(!d)return; if(d.ended){partnerLeft();return;}
+    if(d.answer&&!S.pc.currentRemoteDescription) S.pc.setRemoteDescription(new RTCSessionDescription(d.answer)).catch(()=>{}); });
+  S.unsub.cand=roomRef.collection("calleeCandidates").onSnapshot(sn=>sn.docChanges().forEach(ch=>{ if(ch.type==="added") S.pc.addIceCandidate(new RTCIceCandidate(ch.doc.data())).catch(()=>{}); }));
+  listenMessages(roomId); onMatched();
+}
+async function startAsCallee(roomId){
+  const roomRef=db.collection("rooms").doc(roomId);
+  const snap=await roomRef.get(); if(!snap.exists){ startSearch(); return; }
+  const d=snap.data(); S.roomId=roomId; S.isCaller=false; setPartner(d.callerInfo||{});
+  S.pc=newPC();
+  const cc=roomRef.collection("calleeCandidates");
+  S.pc.onicecandidate=e=>{ if(e.candidate) cc.add(e.candidate.toJSON()); };
+  S.unsub.cand=roomRef.collection("callerCandidates").onSnapshot(sn=>sn.docChanges().forEach(ch=>{ if(ch.type==="added") S.pc.addIceCandidate(new RTCIceCandidate(ch.doc.data())).catch(()=>{}); }));
+  if(d.offer){
+    await S.pc.setRemoteDescription(new RTCSessionDescription(d.offer));
+    const answer=await S.pc.createAnswer(); await S.pc.setLocalDescription(answer);
+    await roomRef.set({answer:{type:answer.type,sdp:answer.sdp}},{merge:true});
+  }
+  S.unsub.room=roomRef.onSnapshot(sn=>{ const dd=sn.data(); if(dd&&dd.ended) partnerLeft(); });
+  listenMessages(roomId); onMatched();
+}
+function selfInfo(){ return {uid:S.uid,country:S.country,flag:S.flag,countryCode:S.countryCode,isRegistered:S.isRegistered}; }
+function setPartner(info){
+  S.peer=info||{};
+  const name=info.isRegistered?"Člen":"Neznámy";
+  el("peerName").textContent=name; el("peerCountry").textContent=info.country||"Neznáma krajina";
+  el("peerFlag").textContent=info.flag||"🌍"; el("peerAva").textContent=info.flag||"?";
+  const rt=el("remoteTile"); rt.querySelector(".pname").textContent=name; rt.querySelector(".flag").textContent=info.flag||"🌍";
+}
+function onMatched(){ S.searching=false; el("searchingOverlay").style.display="none";
+  addSys("Spojený s človekom "+(S.peer.flag||"🌍")+" "+(S.peer.country||"")); el("msgInput").focus(); }
+function partnerLeft(){ addSys("Partner odišiel ⏭"); cleanupConnection(); setSearchingUI(true,"Partner odišiel — hľadám ďalšieho…"); joinQueueAndMatch(); }
+function cleanupConnection(){
+  clearTimeout(S.retryHandle);
+  ["room","cand","msg"].forEach(k=>{ if(S.unsub[k]){S.unsub[k]();S.unsub[k]=null;} });
+  if(S.pc){ try{S.pc.close();}catch(e){} S.pc=null; }
+  const rt=el("remoteTile"); rt.classList.add("hidden"); const v=rt.querySelector("video"); if(v)v.srcObject=null;
+  el("videoGrid").className="videos solo"; S.roomId=null; S.peer=null; if(S.mode==="matched") S.mode="idle";
+}
+function setupSpeaking(stream,tile){
+  try{
+    const ac=new (window.AudioContext||window.webkitAudioContext)();
+    const src=ac.createMediaStreamSource(stream), an=ac.createAnalyser(); an.fftSize=256; src.connect(an);
+    const data=new Uint8Array(an.frequencyBinCount);
+    (function loop(){ if(!tile.isConnected||S.mode!=="matched"){ac.close();return;}
+      an.getByteFrequencyData(data); let s=0; for(const x of data)s+=x;
+      tile.classList.toggle("speaking",s/data.length>18); requestAnimationFrame(loop); })();
+  }catch(e){}
+}
+
+/* ============================================================ MESSAGES */
+function listenMessages(roomId){
+  clearMessages(); if(S.unsub.msg)S.unsub.msg();
+  S.unsub.msg=db.collection("rooms").doc(roomId).collection("messages").orderBy("t","asc")
+    .onSnapshot(sn=>sn.docChanges().forEach(ch=>{ if(ch.type==="added") renderMsg(ch.doc.data()); }));
+}
+function clearMessages(){ el("messages").innerHTML=""; el("messages").appendChild(el("chatEmpty")); el("chatEmpty").style.display="block"; }
+function addSys(txt){ const d=document.createElement("div"); d.className="msg sys"; d.textContent=txt; el("messages").appendChild(d); scrollMsgs(); }
+function scrollMsgs(){ const m=el("messages"); m.scrollTop=m.scrollHeight; }
+function renderMsg(m){
+  el("chatEmpty").style.display="none";
+  const mine=m.from===S.uid;
+  const d=document.createElement("div"); d.className="msg "+(mine?"me":"them");
+  if(m.type==="voice"){
+    d.innerHTML=`<div class="voice"><button>▶</button><div class="bars">${'<i></i>'.repeat(14)}</div><span class="dur">${fmtTime(m.dur||0)}</span></div>`;
+    const btn=d.querySelector("button"), audio=new Audio(m.audio); let playing=false;
+    audio.onended=()=>{btn.textContent="▶";playing=false;};
+    btn.onclick=()=>{ if(playing){audio.pause();btn.textContent="▶";playing=false;} else {audio.play();btn.textContent="⏸";playing=true;} };
+    d.querySelectorAll(".bars i").forEach((b,i)=>b.style.height=(25+Math.abs(Math.sin(i*1.3))*60)+"%");
+  } else {
+    const {out,flagged}=mine?{out:m.text,flagged:false}:filterText(m.text||"");
+    d.innerHTML=esc(out).replace(/\n/g,"<br>")+(flagged?' <span class="flt">(upravené)</span>':'');
+  }
+  el("messages").appendChild(d); scrollMsgs();
+}
+const input=el("msgInput"), sendBtn=el("sendBtn");
+input.addEventListener("input",()=>{ input.style.height="auto"; input.style.height=Math.min(input.scrollHeight,110)+"px"; sendBtn.disabled=!input.value.trim(); });
+input.addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); sendText(); } });
+sendBtn.onclick=sendText;
+async function sendText(){
+  const raw=input.value.trim(); if(!raw||!S.roomId) return;
+  const {out}=filterText(raw);
+  input.value=""; input.style.height="auto"; sendBtn.disabled=true;
+  await db.collection("rooms").doc(S.roomId).collection("messages").add({from:S.uid,type:"text",text:out,t:FV.serverTimestamp()})
+    .catch(()=>toast("Správu sa nepodarilo odoslať.","err"));
+}
+
+/* ============================================================ EMOJI */
+const EMOJI={
+  "Smajlíky":["😀","😃","😄","😁","😆","😅","🤣","😂","🙂","🙃","😉","😊","😇","🥰","😍","🤩","😘","😗","😚","😋","😛","😜","🤪","😝","🤗","🤭","🤫","🤔","😐","😴","🥳","😎","🤓","🥺","😢","😭","😤","😡","🤯","😱","😳","🥵","🥶"],
+  "Gestá":["👍","👎","👏","🙌","🤝","🙏","💪","✌️","🤟","🤘","👌","🤌","👈","👉","👆","👇","☝️","✋","🖐️","🖖","👋","🤙","💅","👀"],
+  "Srdcia":["❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💔","❣️","💕","💞","💓","💗","💖","💘","💝","💯","✨","⭐","🌟","🔥","💥"],
+  "Objekty":["🎉","🎊","🎈","🎁","🌈","☀️","🌙","⚡","☕","🍕","🍔","🍟","🍩","🍺","🍷","🎵","🎧","📷","🎮","⚽","🏀","🚀","💎","👑"]
+};
+function buildEmoji(){ const bar=el("emojiBar");
+  for(const [cat,list] of Object.entries(EMOJI)){
+    const h=document.createElement("div"); h.className="emoji-cat"; h.textContent=cat; bar.appendChild(h);
+    list.forEach(e=>{ const b=document.createElement("button"); b.textContent=e; b.onclick=()=>{ input.value+=e; input.dispatchEvent(new Event("input")); input.focus(); }; bar.appendChild(b); });
+  } }
+el("emojiToggle").onclick=()=>el("emojiBar").classList.toggle("open");
+
+/* ============================================================ VOICE (max 60s) */
+const voiceBtn=el("voiceBtn");
+async function startRec(){
+  if(!S.roomId){ toast("Najprv sa spoj s niekým."); return; }
+  let stream;
+  try{ stream=S.localStream||await navigator.mediaDevices.getUserMedia({audio:true}); }
+  catch(e){ toast("Mikrofón nie je dostupný.","err"); return; }
+  const at=stream.getAudioTracks(); if(!at.length){ toast("Mikrofón nie je dostupný.","err"); return; }
+  const audioStream=new MediaStream(at);
+  const mime=MediaRecorder.isTypeSupported("audio/webm;codecs=opus")?"audio/webm;codecs=opus":"audio/webm";
+  S.recorder=new MediaRecorder(audioStream,{mimeType:mime}); S.recChunks=[]; S.recCancelled=false;
+  S.recorder.ondataavailable=e=>{ if(e.data.size)S.recChunks.push(e.data); };
+  S.recorder.onstop=finishRec; S.recorder.start(); S.recStart=Date.now();
+  el("recUi").classList.add("on"); el("composerRow").style.display="none"; voiceBtn.classList.add("rec");
+  S.recTimer=setInterval(()=>{ const s=Math.floor((Date.now()-S.recStart)/1000); el("recTime").textContent=fmtTime(s); if(s>=60) stopRec(); },200);
+}
+function stopRec(){ if(S.recorder&&S.recorder.state!=="inactive") S.recorder.stop(); cleanupRecUI(); }
+function cancelRec(){ S.recCancelled=true; if(S.recorder&&S.recorder.state!=="inactive") S.recorder.stop(); cleanupRecUI(); }
+function cleanupRecUI(){ clearInterval(S.recTimer); el("recUi").classList.remove("on"); el("composerRow").style.display="flex"; voiceBtn.classList.remove("rec"); }
+async function finishRec(){
+  const cancelled=S.recCancelled; S.recorder=null;
+  if(cancelled||!S.recChunks.length) return;
+  const dur=Math.min(60,Math.round((Date.now()-S.recStart)/1000));
+  const blob=new Blob(S.recChunks,{type:"audio/webm"});
+  if(blob.size>900*1024){ toast("Nahrávka je príliš veľká (skús kratšiu).","err"); return; }
+  const b64=await new Promise(r=>{ const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(blob); });
+  await db.collection("rooms").doc(S.roomId).collection("messages").add({from:S.uid,type:"voice",audio:b64,dur,t:FV.serverTimestamp()})
+    .catch(()=>toast("Hlasovú správu sa nepodarilo odoslať.","err"));
+}
+voiceBtn.onclick=()=>{ if(S.recorder) stopRec(); else startRec(); };
+el("recCancel").onclick=cancelRec;
+
+/* ============================================================ REPORT */
+el("reportBtn").onclick=async()=>{
+  if(!S.peer||!S.peer.uid){ toast("Nikto nie je pripojený."); return; }
+  await db.collection("reports").add({reporter:S.uid,reported:S.peer.uid,roomId:S.roomId,country:S.peer.country||"",t:FV.serverTimestamp(),handled:false}).catch(()=>{});
+  toast("Nahlásené moderátorovi. Hľadám ďalšieho…","ok"); nextPartner();
+};
+
+/* ============================================================ DIRECT CHAT (kód) */
+el("directConnectBtn").onclick=async()=>{
+  const code=el("connectCode").value.trim().toUpperCase(); el("accountErr").textContent="";
+  if(!code){ el("accountErr").textContent="Zadaj kód."; return; }
+  if(code===S.myCode){ el("accountErr").textContent="To je tvoj vlastný kód 🙂"; return; }
+  const cSnap=await db.collection("codes").doc(code).get();
+  if(!cSnap.exists){ el("accountErr").textContent="Kód neexistuje."; return; }
+  const targetUid=cSnap.data().uid;
+  el("accountModal").classList.remove("open");
+  try{ await getMedia(); }catch(e){ return; }
+  el("localFlag").textContent=S.flag; showView("chat");
+  await startDirect("direct__"+[S.uid,targetUid].sort().join("__"), targetUid, code);
+};
+async function startDirect(roomId,targetUid,code){
+  cleanupConnection(); setSearchingUI(true,"Spájam priamo cez kód "+code+"…");
+  const roomRef=db.collection("rooms").doc(roomId);
+  const iAmCaller=S.uid<targetUid;
+  setPartner({uid:targetUid,isRegistered:true,country:"",flag:"🌍"}); S.roomId=roomId; S.mode="matched";
+  if(iAmCaller){
+    await roomRef.set({users:[S.uid,targetUid],caller:S.uid,mode:"direct",ended:false,createdAt:FV.serverTimestamp(),callerInfo:selfInfo()},{merge:true});
+    S.pc=newPC();
+    const cc=roomRef.collection("callerCandidates"); S.pc.onicecandidate=e=>{ if(e.candidate)cc.add(e.candidate.toJSON()); };
+    const offer=await S.pc.createOffer(); await S.pc.setLocalDescription(offer);
+    await roomRef.set({offer:{type:offer.type,sdp:offer.sdp}},{merge:true});
+    S.unsub.room=roomRef.onSnapshot(s=>{ const d=s.data(); if(!d)return; if(d.ended){partnerLeft();return;}
+      if(d.answer&&!S.pc.currentRemoteDescription) S.pc.setRemoteDescription(new RTCSessionDescription(d.answer)).catch(()=>{}); });
+    S.unsub.cand=roomRef.collection("calleeCandidates").onSnapshot(sn=>sn.docChanges().forEach(ch=>{ if(ch.type==="added") S.pc.addIceCandidate(new RTCIceCandidate(ch.doc.data())).catch(()=>{}); }));
+  } else {
+    S.pc=newPC();
+    const cc=roomRef.collection("calleeCandidates"); S.pc.onicecandidate=e=>{ if(e.candidate)cc.add(e.candidate.toJSON()); };
+    await roomRef.set({calleeInfo:selfInfo()},{merge:true}).catch(()=>{});
+    S.unsub.cand=roomRef.collection("callerCandidates").onSnapshot(sn=>sn.docChanges().forEach(ch=>{ if(ch.type==="added") S.pc.addIceCandidate(new RTCIceCandidate(ch.doc.data())).catch(()=>{}); }));
+    S.unsub.room=roomRef.onSnapshot(async s=>{ const d=s.data(); if(!d)return; if(d.ended){partnerLeft();return;}
+      if(d.offer&&!S.pc.currentRemoteDescription){ await S.pc.setRemoteDescription(new RTCSessionDescription(d.offer));
+        const ans=await S.pc.createAnswer(); await S.pc.setLocalDescription(ans);
+        await roomRef.set({answer:{type:ans.type,sdp:ans.sdp}},{merge:true}); } });
+  }
+  listenMessages(roomId); onMatched(); toast("Direct chat cez kód "+code,"ok");
+}
+
+/* ============================================================ PRESENCE */
+function heartbeat(){ if(!S.uid)return; db.collection("presence").doc(S.uid).set({t:FV.serverTimestamp(),country:S.country},{merge:true}).catch(()=>{}); }
+db.collection("presence").onSnapshot(sn=>{ const now=Date.now(); let c=0;
+  sn.forEach(d=>{ const t=d.data().t; if(t&&t.toMillis&&now-t.toMillis()<45000) c++; });
+  el("onlineCount").textContent=c||1;
+},()=>{ el("onlineCount").textContent="—"; });
+setInterval(heartbeat,20000);
+window.addEventListener("beforeunload",()=>{ if(S.uid){
+  db.collection("queue").doc(S.uid).delete().catch(()=>{});
+  if(S.roomId) db.collection("rooms").doc(S.roomId).set({ended:true},{merge:true}).catch(()=>{});
+  db.collection("presence").doc(S.uid).delete().catch(()=>{}); } });
+
+/* ============================================================ INIT */
+(async function init(){ buildEmoji(); await detectCountry(); el("localFlag").textContent=S.flag; setTimeout(heartbeat,1500); })();
+</script>
+</body>
+</html>
