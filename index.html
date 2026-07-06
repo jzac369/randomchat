@@ -244,6 +244,7 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
             <video autoplay playsinline></video>
             <div class="placeholder">Bez videa</div>
             <div class="label"><span class="flag">🌍</span><span class="pname">Neznámy</span></div>
+            <div class="mut hidden" id="remoteMuteBadge">🔇</div>
           </div>
           <div class="searching" id="searchingOverlay">
             <div class="radar"></div>
@@ -456,8 +457,19 @@ function reflectMediaButtons(){
   el("camToggle").textContent=S.camOn?"🎥":"📷"; el("micToggle").textContent=S.micOn?"🎙️":"🔇";
   el("localPlaceholder").classList.toggle("hidden",S.camOn); el("localMuteBadge").classList.toggle("hidden",S.micOn);
 }
-el("camToggle").onclick=()=>{ const t=S.localStream?.getVideoTracks?.()[0]; if(!t){toast("Kamera nie je dostupná.");return;} t.enabled=!t.enabled; reflectMediaButtons(); updateQueueFlags(); };
-el("micToggle").onclick=()=>{ const t=S.localStream?.getAudioTracks?.()[0]; if(!t)return; t.enabled=!t.enabled; reflectMediaButtons(); };
+function applyRemoteMedia(media){
+  const tile=el("remoteTile"); const ph=tile.querySelector(".placeholder");
+  if(media && media.cam===false){ ph.textContent="Partner vypol kameru"; ph.classList.remove("hidden"); }
+  else { ph.textContent="Bez videa"; }
+  el("remoteMuteBadge").classList.toggle("hidden", !(media && media.mic===false));
+}
+function updateMediaStatus(){
+  if(!S.roomId) return;
+  const field = S.isCaller ? "callerMedia" : "calleeMedia";
+  db.collection("rooms").doc(S.roomId).set({[field]:{cam:!!S.camOn,mic:!!S.micOn}},{merge:true}).catch(()=>{});
+}
+el("camToggle").onclick=()=>{ const t=S.localStream?.getVideoTracks?.()[0]; if(!t){toast("Kamera nie je dostupná.");return;} t.enabled=!t.enabled; reflectMediaButtons(); updateQueueFlags(); updateMediaStatus(); };
+el("micToggle").onclick=()=>{ const t=S.localStream?.getAudioTracks?.()[0]; if(!t)return; t.enabled=!t.enabled; reflectMediaButtons(); updateMediaStatus(); };
 
 /* ============================================================ VIEWS */
 function showView(v){ el("landingView").classList.toggle("hidden",v!=="landing"); el("chatView").classList.toggle("hidden",v!=="chat"); }
@@ -565,7 +577,8 @@ async function startAsCaller(roomId,partnerInfo){
   const offer=await S.pc.createOffer(); await S.pc.setLocalDescription(offer);
   await roomRef.set({offer:{type:offer.type,sdp:offer.sdp}},{merge:true});
   S.unsub.room=roomRef.onSnapshot(snap=>{ const d=snap.data(); if(!d)return; if(d.ended){partnerLeft();return;}
-    if(d.answer&&!S.pc.currentRemoteDescription) S.pc.setRemoteDescription(new RTCSessionDescription(d.answer)).catch(()=>{}); });
+    if(d.answer&&!S.pc.currentRemoteDescription) S.pc.setRemoteDescription(new RTCSessionDescription(d.answer)).catch(()=>{});
+    applyRemoteMedia(d.calleeMedia); });
   S.unsub.cand=roomRef.collection("calleeCandidates").onSnapshot(sn=>sn.docChanges().forEach(ch=>{ if(ch.type==="added") S.pc.addIceCandidate(new RTCIceCandidate(ch.doc.data())).catch(()=>{}); }));
   listenMessages(roomId); onMatched();
 }
@@ -583,6 +596,7 @@ async function startAsCallee(roomId){
     const d=sn.data(); if(!d) return;
     if(!partnerSet){ setPartner(d.callerInfo||{}); partnerSet=true; }
     if(d.ended){ partnerLeft(); return; }
+    applyRemoteMedia(d.callerMedia);
     if(d.offer && !S.pc.currentRemoteDescription){
       await S.pc.setRemoteDescription(new RTCSessionDescription(d.offer));
       const answer=await S.pc.createAnswer(); await S.pc.setLocalDescription(answer);
@@ -729,7 +743,7 @@ el("directConnectBtn").onclick=async()=>{
 async function startDirect(roomId,targetUid,code){
   cleanupConnection(); setSearchingUI(true,"Spájam priamo cez kód "+code+"…");
   const roomRef=db.collection("rooms").doc(roomId);
-  const iAmCaller=S.uid<targetUid;
+  const iAmCaller=S.uid<targetUid; S.isCaller=iAmCaller;
   setPartner({uid:targetUid,isRegistered:true,country:"",flag:"🌍"}); S.roomId=roomId; S.mode="matched";
   if(iAmCaller){
     await roomRef.set({users:[S.uid,targetUid],caller:S.uid,mode:"direct",ended:false,createdAt:FV.serverTimestamp(),callerInfo:selfInfo()},{merge:true});
@@ -738,7 +752,8 @@ async function startDirect(roomId,targetUid,code){
     const offer=await S.pc.createOffer(); await S.pc.setLocalDescription(offer);
     await roomRef.set({offer:{type:offer.type,sdp:offer.sdp}},{merge:true});
     S.unsub.room=roomRef.onSnapshot(s=>{ const d=s.data(); if(!d)return; if(d.ended){partnerLeft();return;}
-      if(d.answer&&!S.pc.currentRemoteDescription) S.pc.setRemoteDescription(new RTCSessionDescription(d.answer)).catch(()=>{}); });
+      if(d.answer&&!S.pc.currentRemoteDescription) S.pc.setRemoteDescription(new RTCSessionDescription(d.answer)).catch(()=>{});
+      applyRemoteMedia(d.calleeMedia); });
     S.unsub.cand=roomRef.collection("calleeCandidates").onSnapshot(sn=>sn.docChanges().forEach(ch=>{ if(ch.type==="added") S.pc.addIceCandidate(new RTCIceCandidate(ch.doc.data())).catch(()=>{}); }));
   } else {
     S.pc=newPC();
@@ -746,6 +761,7 @@ async function startDirect(roomId,targetUid,code){
     await roomRef.set({calleeInfo:selfInfo()},{merge:true}).catch(()=>{});
     S.unsub.cand=roomRef.collection("callerCandidates").onSnapshot(sn=>sn.docChanges().forEach(ch=>{ if(ch.type==="added") S.pc.addIceCandidate(new RTCIceCandidate(ch.doc.data())).catch(()=>{}); }));
     S.unsub.room=roomRef.onSnapshot(async s=>{ const d=s.data(); if(!d)return; if(d.ended){partnerLeft();return;}
+      applyRemoteMedia(d.callerMedia);
       if(d.offer&&!S.pc.currentRemoteDescription){ await S.pc.setRemoteDescription(new RTCSessionDescription(d.offer));
         const ans=await S.pc.createAnswer(); await S.pc.setLocalDescription(ans);
         await roomRef.set({answer:{type:ans.type,sdp:ans.sdp}},{merge:true}); } });
