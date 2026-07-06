@@ -443,7 +443,7 @@ function filterText(txt){ let flagged=false,out=txt;
 async function getMedia(){
   if(S.localStream) return S.localStream;
   try{
-    S.localStream=await navigator.mediaDevices.getUserMedia({ video:S.camOn?{width:{ideal:1280},height:{ideal:720}}:false, audio:true });
+    S.localStream=await navigator.mediaDevices.getUserMedia({ video:S.camOn?{width:{ideal:1280,max:1280},height:{ideal:720,max:720},frameRate:{ideal:24,max:30}}:false, audio:true });
   }catch(e){
     try{ S.localStream=await navigator.mediaDevices.getUserMedia({video:false,audio:true}); S.camOn=false; }
     catch(e2){ toast("Nepodarilo sa získať kameru/mikrofón. Skontroluj povolenia prehliadača.","err"); throw e2; }
@@ -551,9 +551,18 @@ async function claimMatch(other){
 /* ============================================================ WEBRTC */
 function newPC(){
   const pc=new RTCPeerConnection(ICE_SERVERS);
-  S.localStream.getTracks().forEach(t=>pc.addTrack(t,S.localStream));
+  S.localStream.getTracks().forEach(t=>{
+    const sender=pc.addTrack(t,S.localStream);
+    if(t.kind==="video"){
+      // Pri slabom signáli radšej zníž rozlíšenie/kvalitu než aby video úplne zamrzlo alebo vypadlo.
+      try{ sender.setParameters({...sender.getParameters(), degradationPreference:"maintain-framerate"}); }catch(e){}
+    }
+  });
   pc.ontrack=ev=>attachRemote(ev.streams[0]);
-  pc.onconnectionstatechange=()=>{ if(["failed"].includes(pc.connectionState)&&S.mode==="matched") addSys("Spojenie zlyhalo — skús Ďalej."); };
+  pc.onconnectionstatechange=()=>{
+    if(pc.connectionState==="failed" && S.mode==="matched") addSys("Spojenie zlyhalo — skús Ďalej.");
+    if(pc.connectionState==="disconnected" && S.mode==="matched") addSys("Slabé spojenie… pokúšam sa obnoviť.");
+  };
   return pc;
 }
 function attachRemote(stream){
