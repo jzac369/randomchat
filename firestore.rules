@@ -5,56 +5,112 @@ service cloud.firestore {
     // ⚠️ Do zoznamu nižšie daj ROVNAKÉ admin e-maily ako v config.js (ADMIN_EMAILS)
     function isAdmin() {
       return request.auth != null &&
-             request.auth.token.email in ['admin@nebula.sk'];
+             request.auth.token.email in ['foresttt11@outlook.com'];
     }
     function signedIn() { return request.auth != null; }
     function isOwner(uid) { return request.auth != null && request.auth.uid == uid; }
 
-    // Moderácia – číta ktokoľvek prihlásený, mení iba admin
+    // Moderácia, nastavenia appky, broadcast — všetko sú dokumenty v kolekcii "config".
+    // Číta ktokoľvek prihlásený, mení iba admin.
     match /config/{doc} {
       allow read: if signedIn();
       allow write: if isAdmin();
     }
 
     // Fronta čakajúcich – prihlásení vidia všetkých (párovanie).
-    // Zápis povolený prihláseným (transakcia potrebuje označiť aj druhého v páre).
     match /queue/{uid} {
       allow read: if signedIn();
       allow create, update: if signedIn();
       allow delete: if signedIn();
     }
 
-    // Miestnosti + signaling (offer/answer/ICE) + správy
+    // Miestnosti + signaling (offer/answer/ICE) + správy.
+    // "get" = čítanie JEDNEJ konkrétnej izby podľa ID (bežní účastníci, ktorí svoje roomId poznajú).
+    // "list" = vypísanie/filtrovanie CELEJ kolekcie (iba admin panel).
+    // Podkolekcie sú vymenované explicitne (nie wildcard `{sub=**}`), aby sme mohli
+    // pre "viewerRequests" (live náhľad admina) nastaviť prísnejšie pravidlá zvlášť —
+    // Firestore totiž kombinuje viacero vyhovujúcich pravidiel logickým OR, takže široký
+    // wildcard by inak nechtiac povolil aj to, čo špecifickejšie pravidlo zakazuje.
     match /rooms/{roomId} {
-      allow read, create, update: if signedIn();
-      match /{sub=**} {
-        allow read, create, update, delete: if signedIn();
+      allow get: if signedIn();
+      allow list: if isAdmin();
+      allow create, update: if signedIn();
+
+      match /messages/{msgId} { allow read, create, update, delete: if signedIn(); }
+      match /callerCandidates/{cid} { allow read, create, update, delete: if signedIn(); }
+      match /calleeCandidates/{cid} { allow read, create, update, delete: if signedIn(); }
+
+      // Live náhľad na vyžiadanie: vytvoriť žiadosť (offer) môže LEN admin;
+      // účastník rozhovoru smie iba doplniť svoju odpoveď (update), nie vytvoriť novú žiadosť.
+      match /viewerRequests/{role} {
+        allow read: if signedIn();
+        allow create: if isAdmin();
+        allow update: if signedIn();
+        allow delete: if isAdmin();
+        match /viewerCandidates/{cid} { allow read, create, update, delete: if signedIn(); }
+        match /participantCandidates/{cid} { allow read, create, update, delete: if signedIn(); }
       }
     }
 
-    // Používatelia (registrovaní) – čítanie prihláseným (direct chat cez kód), zápis len vlastný
+    // Registrovaní používatelia – vlastný doklad čítať/písať môže len majiteľ alebo admin;
+    // vypísať celý zoznam (pre admin panel) môže len admin.
     match /users/{uid} {
-      allow read: if signedIn();
+      allow get: if isOwner(uid) || isAdmin();
+      allow list: if isAdmin();
       allow write: if isOwner(uid);
     }
 
-    // Kódy pre direct chat – čítanie prihláseným, vytvorenie iba raz (bez prepisu)
+    // Kódy pre direct chat – vyhľadanie podľa konkrétneho kódu môže ktokoľvek prihlásený,
+    // vypísanie celej kolekcie len admin.
     match /codes/{code} {
-      allow read: if signedIn();
+      allow get: if signedIn();
+      allow list: if isAdmin();
       allow create: if signedIn();
       allow update, delete: if isAdmin();
     }
 
-    // Prítomnosť (online počítadlo)
+    // Prítomnosť (online počítadlo) – potrebuje list-read pre všetkých (počítadlo online).
     match /presence/{uid} {
       allow read: if signedIn();
       allow write: if isOwner(uid);
     }
 
-    // Nahlásenia – vytvoriť môže hocikto prihlásený, čítať/riešiť iba admin
+    // Nahlásenia – vytvoriť môže hocikto prihlásený, čítať/riešiť iba admin.
     match /reports/{id} {
       allow create: if signedIn();
       allow read, update, delete: if isAdmin();
+    }
+
+    // Denná návštevnosť/štatistiky pre admin grafy – zapisovať smie ktokoľvek prihlásený
+    // (klient si sám inkrementuje počítadlo), čítať len admin.
+    match /analytics/{day} {
+      allow read: if isAdmin();
+      allow write: if signedIn();
+    }
+
+    // Log akcií admina – zapisovať aj čítať smie len admin.
+    match /adminLogs/{id} {
+      allow create: if isAdmin();
+      allow read: if isAdmin();
+    }
+
+    // Prezývky (nová identita namiesto e-mailovej registrácie).
+    // "create" (úplne nový dokument) môže ktokoľvek prihlásený, ale iba na SEBA (uid musí sedieť).
+    // "update" (existujúci dokument) je povolený buď majiteľovi (obnovenie tepu), alebo hocikomu,
+    // ak je záznam už "starý" (> 45s bez tepu) — vtedy sa prezývka smie prevziať.
+    match /nicknames/{nick} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow update: if signedIn() && request.resource.data.uid == request.auth.uid &&
+        (resource.data.uid == request.auth.uid || request.time > resource.data.t + duration.value(45, 's'));
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    // Osobná história posledných partnerov – vidí a píše iba majiteľ.
+    match /history/{uid} {
+      match /items/{id} {
+        allow read, write: if isOwner(uid);
+      }
     }
   }
 }
