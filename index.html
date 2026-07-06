@@ -546,7 +546,11 @@ function newPC(){
 }
 function attachRemote(stream){
   const tile=el("remoteTile"); tile.classList.remove("hidden");
-  tile.querySelector("video").srcObject=stream;
+  const v=tile.querySelector("video"); v.srcObject=stream;
+  const ph=tile.querySelector(".placeholder");
+  const hasVideoTrack=stream.getVideoTracks().length>0;
+  ph.classList.toggle("hidden", hasVideoTrack);
+  v.onloadedmetadata=()=>{ ph.classList.add("hidden"); };
   el("searchingOverlay").style.display="none"; el("videoGrid").className="videos duo"; el("nextBtn").disabled=false;
   setupSpeaking(stream,tile);
 }
