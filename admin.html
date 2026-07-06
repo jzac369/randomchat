@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>NEBULA · Admin</title>
+<title>FreeChat · Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -105,7 +105,7 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
 <body>
 
 <div id="gate" class="gate">
-  <div class="brand" style="margin-bottom:16px"><span class="orb"></span> NE<b>BULA</b> <span class="tag">ADMIN</span></div>
+  <div class="brand" style="margin-bottom:16px"><span class="orb"></span> Free<b>Chat</b> <span class="tag">ADMIN</span></div>
   <h2>Moderator login</h2>
   <p>Only accounts listed as admins have access.</p>
   <label>Email</label><input id="gEmail" type="email" placeholder="admin@nebula.sk">
@@ -116,7 +116,7 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
 
 <div id="panel" class="hidden">
   <div class="topbar">
-    <div class="brand"><span class="orb"></span> NE<b>BULA</b> <span class="tag">ADMIN</span></div>
+    <div class="brand"><span class="orb"></span> Free<b>Chat</b> <span class="tag">ADMIN</span></div>
     <div class="spacer"></div>
     <button class="btn sm" id="soundToggle" title="Toggle report sound alert">🔔 Sound on</button>
     <span class="top-email" id="topEmail"></span>
@@ -147,8 +147,6 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
       <h3>⚙️ App settings</h3>
       <div class="card-body">
         <div class="settings-row">
-          <label><input type="checkbox" id="setRegistration"> Allow new registrations</label>
-          <label><input type="checkbox" id="setDirectChat"> Allow direct chat by code</label>
           <label><input type="checkbox" id="setCameraOnly"> Force camera-only matching for everyone</label>
         </div>
       </div>
@@ -194,7 +192,17 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
 
       <div class="card" style="margin-bottom:0">
         <h3>🚩 Reports <span class="count" id="repCount">0</span><button class="btn sm" id="exportReportsBtn" style="margin-left:8px">Export CSV</button></h3>
-        <div class="card-body" id="reportList"><div class="empty">No reports.</div></div>
+        <div class="card-body">
+          <select id="reportReasonFilter" style="width:100%;margin-bottom:12px">
+            <option value="">All reasons</option>
+            <option value="inappropriate">Inappropriate content</option>
+            <option value="spam">Spam</option>
+            <option value="harassment">Harassment</option>
+            <option value="nudity">Nudity / sexual content</option>
+            <option value="other">Other</option>
+          </select>
+          <div id="reportList"><div class="empty">No reports.</div></div>
+        </div>
       </div>
     </div>
 
@@ -220,6 +228,29 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
     </div>
 
     <div class="card full">
+      <h3>🗺️ Live map — who's online right now</h3>
+      <div class="card-body tall">
+        <div id="worldMap"><div class="empty">No one online yet.</div></div>
+      </div>
+    </div>
+
+    <div class="card full">
+      <h3>🩺 Health check</h3>
+      <div class="card-body">
+        <p style="color:var(--muted);font-size:13px;margin:0 0 10px">
+          Firestore's real quota/billing usage isn't accessible from a client-side web app — check it directly in the
+          <a href="#" id="healthConsoleLink" target="_blank" style="color:var(--cyan)">Firebase Console → Usage tab</a>
+          for exact reads/writes against your Spark plan daily limits.
+        </p>
+        <div style="display:flex;gap:24px;flex-wrap:wrap">
+          <div><div class="n" style="font-family:'Space Grotesk';font-size:24px;font-weight:700" id="healthVisitsToday">—</div><div style="color:var(--muted);font-size:12px">Visits today (our own count)</div></div>
+          <div><div class="n" style="font-family:'Space Grotesk';font-size:24px;font-weight:700" id="healthChatsToday">—</div><div style="color:var(--muted);font-size:12px">Chats started today</div></div>
+        </div>
+        <p style="color:var(--muted-2);font-size:11.5px;margin-top:10px">These are rough activity proxies we track ourselves, not official quota numbers.</p>
+      </div>
+    </div>
+
+    <div class="card full">
       <h3>💬 Active chats <span class="count" id="roomCount">0</span></h3>
       <div class="card-body tall">
         <input id="roomSearch" placeholder="Filter by country or UID…" style="width:100%;margin-bottom:12px">
@@ -236,9 +267,9 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
     </div>
 
     <div class="card full">
-      <h3>👤 Registered users <span class="count" id="usersCount">0</span></h3>
+      <h3>👤 Active nicknames <span class="count" id="usersCount">0</span></h3>
       <div class="card-body tall">
-        <input id="usersSearch" placeholder="Search by email or code…" style="width:100%;margin-bottom:12px">
+        <input id="usersSearch" placeholder="Search by nickname…" style="width:100%;margin-bottom:12px">
         <div id="usersList"><div class="empty">No users found.</div></div>
       </div>
     </div>
@@ -333,6 +364,12 @@ function playAlertSound(){
 let started=false;
 function startAdmin(){
   if(started) return; started=true;
+  el("healthConsoleLink").href = "https://console.firebase.google.com/project/"+FIREBASE_CONFIG.projectId+"/usage";
+  db.collection("analytics").doc(todayKey()).onSnapshot(snap=>{
+    const d=snap.data()||{};
+    el("healthVisitsToday").textContent = d.visits||0;
+    el("healthChatsToday").textContent = d.chats||0;
+  },()=>{});
   const modRef=db.collection("config").doc("moderation");
   modRef.get().then(s=>{ if(!s.exists) modRef.set({blockedKeywords:[],bannedUsers:{},bannedEmails:{}}); });
 
@@ -389,8 +426,6 @@ function startAdmin(){
   settingsRef.onSnapshot(snap=>{
     const s=snap.data()||{};
     settingsLoaded=false;
-    el("setRegistration").checked = s.registrationEnabled!==false;
-    el("setDirectChat").checked = s.directChatEnabled!==false;
     el("setCameraOnly").checked = s.cameraOnlyForced===true;
     settingsLoaded=true;
   });
@@ -402,13 +437,14 @@ function startAdmin(){
       logAdminAction("settings_change",field+"="+val); toast("Setting updated","ok");
     };
   }
-  bindSetting("setRegistration","registrationEnabled");
-  bindSetting("setDirectChat","directChatEnabled");
   bindSetting("setCameraOnly","cameraOnlyForced");
 
-  db.collection("presence").onSnapshot(sn=>{ const now=Date.now(); let c=0;
-    sn.forEach(d=>{ const t=d.data().t; if(t&&t.toMillis&&now-t.toMillis()<45000)c++; });
-    el("sOnline").textContent=c; });
+  db.collection("presence").onSnapshot(sn=>{ const now=Date.now(); let c=0; const byCountry={};
+    sn.forEach(d=>{ const p=d.data(); const t=p.t; if(t&&t.toMillis&&now-t.toMillis()<45000){ c++;
+      const cc=p.countryCode||"XX"; byCountry[cc]=(byCountry[cc]||0)+1; } });
+    el("sOnline").textContent=c;
+    renderWorldMap(byCountry);
+  });
 
   db.collection("queue").onSnapshot(sn=>{
     const items=[]; sn.forEach(d=>items.push(d.data()));
@@ -451,13 +487,19 @@ function startAdmin(){
   let lastReports=[], prevOpenCount=null;
   db.collection("reports").onSnapshot(sn=>{
     const reps=[]; sn.forEach(d=>reps.push({id:d.id,...d.data()}));
-    lastReports=reps;
+    lastReports=reps.sort((a,b)=>((b.t&&b.t.toMillis)?b.t.toMillis():0)-((a.t&&a.t.toMillis)?a.t.toMillis():0));
     const open=reps.filter(r=>!r.handled);
     el("sReports").textContent=open.length; el("repCount").textContent=open.length;
     if(prevOpenCount!==null && open.length>prevOpenCount) playAlertSound();
     prevOpenCount=open.length;
-    renderReports(reps.sort((a,b)=>((b.t&&b.t.toMillis)?b.t.toMillis():0)-((a.t&&a.t.toMillis)?a.t.toMillis():0)));
+    renderReportsFiltered();
   });
+  el("reportReasonFilter").addEventListener("change",renderReportsFiltered);
+  function renderReportsFiltered(){
+    const rf=el("reportReasonFilter").value;
+    const filtered = rf? lastReports.filter(r=>(r.reason||"").toLowerCase().includes(rf)) : lastReports;
+    renderReports(filtered);
+  }
   el("exportReportsBtn").onclick=()=>{
     const rows=[["Time","Reporter","Reported","Room","Country","Status"]];
     lastReports.forEach(r=>{
@@ -525,30 +567,51 @@ function startAdmin(){
   }
   function renderHistory(){
     el("historyCount").textContent=historyItems.length;
-    el("historyList").innerHTML = historyItems.length? historyItems.map(function(r){
+    const durations=[];
+    historyItems.forEach(function(r){
+      if(r.createdAt&&r.createdAt.toMillis&&r.endedAt&&r.endedAt.toMillis){
+        const d=(r.endedAt.toMillis()-r.createdAt.toMillis())/1000;
+        if(d>0 && d<3600*4) durations.push(d);
+      }
+    });
+    let statsHtml="";
+    if(durations.length){
+      const sum=durations.reduce(function(a,b){return a+b;},0);
+      const avg=sum/durations.length;
+      const sorted=durations.slice().sort(function(a,b){return a-b;});
+      const median=sorted[Math.floor(sorted.length/2)];
+      function fmt(s){ return Math.floor(s/60)+"m "+Math.round(s%60)+"s"; }
+      statsHtml='<div style="display:flex;gap:24px;margin-bottom:14px;font-size:13px;color:var(--muted)">'+
+        '<span>Avg. duration: <b style="color:var(--text)">'+fmt(avg)+'</b></span>'+
+        '<span>Median: <b style="color:var(--text)">'+fmt(median)+'</b></span></div>';
+    }
+    const rows = historyItems.length? historyItems.map(function(r){
       const ci=r.callerInfo||{}, ce=r.calleeInfo||{};
       const when=r.endedAt&&r.endedAt.toDate?r.endedAt.toDate().toLocaleString():"?";
-      return '<div class="row-item"><span class="flag">'+(ci.flag||"🌍")+'</span><div class="info"><b>'+esc(ci.country||"?")+' ↔ '+esc(ce.country||"?")+' '+(ce.flag||"")+'</b><small>'+when+' · mode: '+(r.mode||"random")+'</small></div></div>';
+      return '<div class="row-item"><span class="flag">'+(ci.flag||"🌍")+'</span><div class="info"><b>'+esc(ci.nickname||"Anonymous")+' ↔ '+esc(ce.nickname||"Anonymous")+'</b><small>'+esc(ci.country||"?")+' ↔ '+esc(ce.country||"?")+' · '+when+' · mode: '+(r.mode||"random")+'</small></div></div>';
     }).join("") : '<div class="empty">No history yet.</div>';
+    el("historyList").innerHTML = statsHtml + rows;
   }
   el("loadMoreHistory").onclick=()=>loadHistory(false);
   loadHistory(true);
 
   let allUsers=[];
   function loadUsers(){
-    db.collection("users").limit(300).get().then(snap=>{
-      allUsers=[]; snap.forEach(d=>allUsers.push({uid:d.id,...d.data()}));
+    db.collection("nicknames").limit(300).get().then(snap=>{
+      allUsers=[]; snap.forEach(d=>allUsers.push({key:d.id,...d.data()}));
       el("usersCount").textContent=allUsers.length;
       renderUsers();
-    }).catch(()=>{ el("usersList").innerHTML='<div class="empty">Could not load users.</div>'; });
+    }).catch(()=>{ el("usersList").innerHTML='<div class="empty">Could not load nicknames.</div>'; });
   }
   function renderUsers(){
     const q=el("usersSearch").value.trim().toLowerCase();
-    const filtered=allUsers.filter(u=>!q||(u.email||"").toLowerCase().includes(q)||(u.code||"").toLowerCase().includes(q));
+    const now=Date.now();
+    const filtered=allUsers.filter(u=>!q||(u.nickname||"").toLowerCase().includes(q));
     el("usersList").innerHTML = filtered.length? filtered.map(function(u){
-      const created=u.createdAt&&u.createdAt.toDate?u.createdAt.toDate().toLocaleDateString():"?";
-      return '<div class="row-item"><span class="flag">👤</span><div class="info"><b>'+esc(u.email||"?")+'</b><small>'+esc(u.code||"")+' · joined '+created+'</small></div></div>';
-    }).join("") : '<div class="empty">No users found.</div>';
+      const isLive = u.t && u.t.toMillis && (now-u.t.toMillis())<45000;
+      const since=u.t&&u.t.toDate?u.t.toDate().toLocaleString():"?";
+      return '<div class="row-item"><span class="flag">👤</span><div class="info"><b>'+esc(u.nickname||u.key)+'</b><small>'+(u.status?esc(u.status)+' · ':'')+'active since '+since+'</small></div><span class="badge '+(isLive?'reg':'anon')+'">'+(isLive?'online':'offline')+'</span></div>';
+    }).join("") : '<div class="empty">No nicknames found.</div>';
   }
   el("usersSearch").addEventListener("input",renderUsers);
   loadUsers();
@@ -584,14 +647,14 @@ function renderBanned(usersMap, emailsMap){
 }
 function renderQueue(items){
   el("queueList").innerHTML = items.length? items.map(function(i){
-    return '<div class="row-item"><span class="flag">'+(i.flag||"🌍")+'</span><div class="info"><b>'+esc(i.country||"Unknown")+'</b><small>'+short(i.uid)+'</small></div><span class="badge '+(i.isRegistered?'reg':'anon')+'">'+(i.isRegistered?'member':'guest')+'</span>'+(i.hasCamera?'<span class="badge wait">📹</span>':'')+'<button class="btn danger sm" onclick="_ban(\''+esc(i.uid)+'\')">Ban</button></div>';
+    return '<div class="row-item"><span class="flag">'+(i.flag||"🌍")+'</span><div class="info"><b>'+esc(i.nickname||"Anonymous")+'</b><small>'+esc(i.country||"Unknown")+' · '+short(i.uid)+'</small></div>'+(i.hasCamera?'<span class="badge wait">📹</span>':'')+'<button class="btn danger sm" onclick="_ban(\''+esc(i.uid)+'\')">Ban</button></div>';
   }).join("") : '<div class="empty">No one is waiting.</div>';
 }
 function renderReports(reps){
   el("reportList").innerHTML = reps.length? reps.map(function(r){
-    return '<div class="row-item"><span class="flag">🚩</span><div class="info"><b>'+esc(r.country||"?")+' · '+(r.handled?'resolved':'new')+'</b><small>reported: '+short(r.reported)+'</small></div>'+
+    return '<div class="row-item"><span class="flag">🚩</span><div class="info"><b>'+esc(r.country||"?")+' · '+(r.handled?'resolved':'new')+'</b><small>reported: '+short(r.reported)+' · reason: '+esc(r.reason||"unspecified")+'</small></div>'+
       (r.handled?'':'<button class="btn danger sm" onclick="_ban(\''+esc(r.reported)+'\')">Ban</button><button class="btn sm" onclick="_resolve(\''+r.id+'\')">Resolve</button>')+'</div>';
-  }).join("") : '<div class="empty">No reports.</div>';
+  }).join("") : '<div class="empty">No reports match this filter.</div>';
 }
 window._resolve=async(id)=>{ await db.collection("reports").doc(id).update({handled:true}); logAdminAction("resolve_report",id); toast("Resolved","ok"); };
 
@@ -624,8 +687,8 @@ function renderRooms(rooms, staleRooms){
     }).join("")+'</div>' : "";
     box.innerHTML='<div style="display:flex;align-items:center;gap:12px;width:100%;flex-wrap:wrap">'+
         '<span class="flag">'+(ci.flag||"🌍")+'</span>'+
-        '<div class="info"><b>'+esc(ci.country||"?")+' ↔ '+esc(ce.country||"?")+' '+(ce.flag||"")+'</b>'+
-          '<small>'+short(r.caller)+' · mode: '+(r.mode||"random")+'</small></div>'+
+        '<div class="info"><b>'+esc(ci.nickname||"Anonymous")+' ↔ '+esc(ce.nickname||"Anonymous")+'</b>'+
+          '<small>'+(ci.flag||"🌍")+' '+esc(ci.country||"?")+' ↔ '+(ce.flag||"🌍")+' '+esc(ce.country||"?")+' · mode: '+(r.mode||"random")+'</small></div>'+
         '<span class="badge live">live</span>'+
         '<button class="btn sm" data-live="'+r.id+'">👁 Live view</button>'+
         '<button class="btn danger sm" data-close="'+r.id+'">End</button>'+
@@ -658,6 +721,36 @@ function renderRooms(rooms, staleRooms){
   });
 }
 function openLightbox(src){ el("lightboxImg").src=src; el("lightbox").style.display="flex"; }
+
+/* ---------- WORLD MAP (approximate, schematic — not pixel-precise cartography) ---------- */
+const COUNTRY_LATLNG={
+  US:[38,-97],GB:[54,-2],SK:[48.7,19.7],CZ:[49.8,15.5],DE:[51.2,10.5],FR:[46.2,2.2],ES:[40.5,-3.7],
+  IT:[42.8,12.6],PL:[51.9,19.1],NL:[52.1,5.3],AT:[47.5,14.6],HU:[47.2,19.5],RO:[45.9,25],UA:[48.4,31.2],
+  RU:[61,105],PT:[39.4,-8.2],SE:[60.1,18.6],NO:[60.5,8.5],FI:[61.9,25.7],DK:[56.3,9.5],BE:[50.5,4.5],
+  CH:[46.8,8.2],IE:[53.4,-8],GR:[39.1,21.8],TR:[38.9,35.2],BR:[-14.2,-51.9],MX:[23.6,-102.5],
+  AR:[-38.4,-63.6],CA:[56.1,-106.3],AU:[-25.3,133.8],NZ:[-40.9,174.9],JP:[36.2,138.3],KR:[35.9,127.8],
+  CN:[35.9,104.2],IN:[20.6,79],ID:[-0.8,113.9],PH:[12.9,121.8],TH:[15.9,100.9],VN:[14.1,108.3],
+  ZA:[-30.6,22.9],EG:[26.8,30.8],NG:[9.1,8.7],IL:[31,34.8],AE:[23.4,53.8],SA:[23.9,45.1],
+  HR:[45.1,15.2],SI:[46.2,15],BG:[42.7,25.5],RS:[44,21],LT:[55.2,23.9],LV:[56.9,24.6],EE:[58.6,25],XX:[20,0]
+};
+function renderWorldMap(byCountry){
+  const host=el("worldMap"); if(!host) return;
+  const w=900,h=420;
+  let dots="";
+  Object.keys(byCountry).forEach(function(cc){
+    const ll=COUNTRY_LATLNG[cc]||COUNTRY_LATLNG.XX;
+    const x=((ll[1]+180)/360)*w, y=((90-ll[0])/180)*h;
+    const n=byCountry[cc];
+    const r=Math.min(22,6+n*3);
+    dots+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="#22d3ee" fill-opacity="0.35" stroke="#22d3ee" stroke-width="1.5"><title>'+flagOf(cc)+' '+cc+': '+n+' online</title></circle>';
+    dots+='<text x="'+x+'" y="'+(y+4)+'" text-anchor="middle" font-size="11" fill="#ece9ff" font-weight="700">'+n+'</text>';
+  });
+  let grid="";
+  for(let gx=0;gx<=w;gx+=w/12) grid+='<line x1="'+gx+'" y1="0" x2="'+gx+'" y2="'+h+'" stroke="#ffffff10"/>';
+  for(let gy=0;gy<=h;gy+=h/6) grid+='<line x1="0" y1="'+gy+'" x2="'+w+'" y2="'+gy+'" stroke="#ffffff10"/>';
+  host.innerHTML='<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;height:280px;background:#0c0a20;border-radius:12px;border:1px solid var(--line)">'+grid+dots+'</svg>'+
+    '<p style="color:var(--muted-2);font-size:11.5px;margin-top:8px">Approximate positions by country (schematic, not exact geography). Circle size = number of people currently online from that country.</p>';
+}
 
 let liveViewState={ roomId:null, pcs:{}, unsubs:{} };
 async function openLiveView(roomId, ci, ce){
