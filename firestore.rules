@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ⚠️ Do zoznamu nižšie daj ROVNAKÉ admin e-maily ako v config.js (ADMIN_EMAILS)
+    function isAdmin() {
+      return request.auth != null &&
+             request.auth.token.email in ['admin@nebula.sk'];
+    }
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return request.auth != null && request.auth.uid == uid; }
+
+    // Moderácia – číta ktokoľvek prihlásený, mení iba admin
+    match /config/{doc} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    // Fronta čakajúcich – prihlásení vidia všetkých (párovanie).
+    // Zápis povolený prihláseným (transakcia potrebuje označiť aj druhého v páre).
+    match /queue/{uid} {
+      allow read: if signedIn();
+      allow create, update: if signedIn();
+      allow delete: if signedIn();
+    }
+
+    // Miestnosti + signaling (offer/answer/ICE) + správy
+    match /rooms/{roomId} {
+      allow read, create, update: if signedIn();
+      match /{sub=**} {
+        allow read, create, update, delete: if signedIn();
+      }
+    }
+
+    // Používatelia (registrovaní) – čítanie prihláseným (direct chat cez kód), zápis len vlastný
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow write: if isOwner(uid);
+    }
+
+    // Kódy pre direct chat – čítanie prihláseným, vytvorenie iba raz (bez prepisu)
+    match /codes/{code} {
+      allow read: if signedIn();
+      allow create: if signedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    // Prítomnosť (online počítadlo)
+    match /presence/{uid} {
+      allow read: if signedIn();
+      allow write: if isOwner(uid);
+    }
+
+    // Nahlásenia – vytvoriť môže hocikto prihlásený, čítať/riešiť iba admin
+    match /reports/{id} {
+      allow create: if signedIn();
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}
