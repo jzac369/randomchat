@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="sk">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>NEBULA · náhodný video chat</title>
+<title>NEBULA · random video chat</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -194,37 +194,37 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
     <div class="brand"><span class="orb"></span> NE<b>BULA</b></div>
     <span class="pill live" id="onlinePill"><span class="dot"></span><span id="onlineCount">—</span> online</span>
     <div class="spacer"></div>
-    <span class="pill" id="userPill"><span class="dot"></span><span id="userPillText">Hosť</span></span>
-    <button class="ghost-btn" id="accountBtn">Účet</button>
+    <span class="pill" id="userPill"><span class="dot"></span><span id="userPillText">Guest</span></span>
+    <button class="ghost-btn" id="accountBtn">Account</button>
   </div>
 
   <!-- LANDING -->
   <div class="view center" id="landingView">
     <div class="hero">
-      <div class="eyebrow">Náhodné spojenia · bez registrácie</div>
-      <h1>Stretni <span>niekoho nového</span><br>za jediné kliknutie</h1>
-      <p class="sub">Zapneš kameru, stlačíš tlačidlo a systém ťa spojí s náhodným človekom. Nepáči sa? Ďalší je vzdialený jedno „Ďalej“.</p>
+      <div class="eyebrow">Random connections · no signup</div>
+      <h1>Meet <span>someone new</span><br>with a single click</h1>
+      <p class="sub">Turn on your camera, hit the button, and we'll connect you with a random person. Not feeling it? The next one is just one "Next" away.</p>
       <div class="start-card">
         <div class="opts">
           <div class="opt-row">
             <div class="ico">🎥</div>
-            <div class="txt"><b>Zapnúť kameru a mikrofón</b><small>Video chat naživo cez WebRTC</small></div>
+            <div class="txt"><b>Turn on camera and microphone</b><small>Live video chat via WebRTC</small></div>
             <div class="switch"><input type="checkbox" id="optCam" checked><label for="optCam"></label></div>
           </div>
           <div class="opt-row">
             <div class="ico">📹</div>
-            <div class="txt"><b>Len ľudia so zapnutou kamerou</b><small>Spájať iba s tými, čo majú video</small></div>
+            <div class="txt"><b>Only people with camera on</b><small>Match only with people who have video</small></div>
             <div class="switch"><input type="checkbox" id="optCamOnly"><label for="optCamOnly"></label></div>
           </div>
         </div>
-        <button class="btn-primary" id="startBtn">Spustiť náhodný chat</button>
+        <button class="btn-primary" id="startBtn">Start random chat</button>
         <div class="auth-links">
-          <a id="loginLink">Prihlásiť sa</a> alebo <a id="registerLink">vytvoriť účet</a> · pre direct chat cez kód
+          <a id="loginLink">Log in</a> or <a id="registerLink">create an account</a> · for direct chat by code
         </div>
-        <div class="age-note">Stlačením súhlasíš, že máš 18+ a budeš dodržiavať slušné správanie. Chat je moderovaný.</div>
+        <div class="age-note">By clicking you confirm you are 18+ and agree to behave respectfully. Chat is moderated.</div>
       </div>
       <div class="feature-strip">
-        <span>😊 Emotikony</span><span>🎙️ Hlasové správy do 1 min</span><span>🌍 Krajina partnera</span><span>🛡️ Moderovaný chat</span><span>🔑 Direct chat cez kód</span>
+        <span>😊 Emoji</span><span>🎙️ Voice messages up to 1 min</span><span>🌍 Partner's country</span><span>🛡️ Moderated chat</span><span>🔑 Direct chat by code</span>
       </div>
     </div>
   </div>
@@ -236,52 +236,52 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
         <div class="videos solo" id="videoGrid">
           <div class="vtile local">
             <video id="localVideo" autoplay muted playsinline></video>
-            <div class="placeholder" id="localPlaceholder">Kamera je vypnutá</div>
-            <div class="label"><span class="flag" id="localFlag">🌍</span> Ty</div>
+            <div class="placeholder" id="localPlaceholder">Camera is off</div>
+            <div class="label"><span class="flag" id="localFlag">🌍</span> You</div>
             <div class="mut hidden" id="localMuteBadge">🔇</div>
           </div>
           <div class="vtile remote hidden" id="remoteTile">
             <video autoplay playsinline></video>
-            <div class="placeholder">Bez videa</div>
-            <div class="label"><span class="flag">🌍</span><span class="pname">Neznámy</span></div>
+            <div class="placeholder">No video</div>
+            <div class="label"><span class="flag">🌍</span><span class="pname">Unknown</span></div>
             <div class="mut hidden" id="remoteMuteBadge">🔇</div>
           </div>
           <div class="searching" id="searchingOverlay">
             <div class="radar"></div>
-            <h3>Hľadám niekoho…</h3>
-            <p id="searchingSub">Prepájam ťa s náhodným účastníkom</p>
+            <h3>Looking for someone…</h3>
+            <p id="searchingSub">Connecting you with a random participant</p>
           </div>
         </div>
         <div class="controls">
-          <button class="cbtn" id="camToggle" title="Kamera">🎥</button>
-          <button class="cbtn" id="micToggle" title="Mikrofón">🎙️</button>
-          <button class="next-btn" id="nextBtn">⏭ Ďalej</button>
-          <button class="stop-btn" id="stopBtn" title="Ukončiť">⏹</button>
+          <button class="cbtn" id="camToggle" title="Camera">🎥</button>
+          <button class="cbtn" id="micToggle" title="Microphone">🎙️</button>
+          <button class="next-btn" id="nextBtn">⏭ Next</button>
+          <button class="stop-btn" id="stopBtn" title="End call">⏹</button>
         </div>
       </div>
       <div class="chat-panel">
         <div class="chat-head">
           <div class="peer-ava" id="peerAva">?</div>
           <div class="meta">
-            <b id="peerName">Čakám na spojenie…</b>
+            <b id="peerName">Waiting to connect…</b>
             <small><span class="flag" id="peerFlag">🌍</span><span id="peerCountry">—</span></small>
           </div>
-          <button class="rep" id="reportBtn" title="Nahlásiť a preskočiť">🚩 Nahlásiť</button>
+          <button class="rep" id="reportBtn" title="Report and skip">🚩 Report</button>
         </div>
         <div class="messages" id="messages">
-          <div class="chat-empty" id="chatEmpty">Správy sa zobrazia tu.<br>Buď slušný — chat je moderovaný. 💜</div>
+          <div class="chat-empty" id="chatEmpty">Messages will appear here.<br>Be kind — chat is moderated. 💜</div>
         </div>
         <div class="composer">
           <div class="rec-ui" id="recUi">
-            <span class="rdot"></span><span>Nahrávam</span><span class="rtime" id="recTime">0:00</span>
+            <span class="rdot"></span><span>Recording</span><span class="rtime" id="recTime">0:00</span>
             <span style="color:var(--muted);font-size:12px">/ max 1:00</span>
-            <button class="cancel" id="recCancel">Zrušiť</button>
+            <button class="cancel" id="recCancel">Cancel</button>
           </div>
           <div class="emoji-bar" id="emojiBar"></div>
           <div class="composer-row" id="composerRow">
-            <button class="icon-btn" id="emojiToggle" title="Emotikony">😊</button>
-            <button class="icon-btn" id="voiceBtn" title="Nahrať hlasovú správu">🎙️</button>
-            <textarea id="msgInput" rows="1" placeholder="Napíš správu…"></textarea>
+            <button class="icon-btn" id="emojiToggle" title="Emoji">😊</button>
+            <button class="icon-btn" id="voiceBtn" title="Record voice message">🎙️</button>
+            <textarea id="msgInput" rows="1" placeholder="Type a message…"></textarea>
             <button class="send-btn" id="sendBtn" disabled>➤</button>
           </div>
         </div>
@@ -294,13 +294,13 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
 <div class="modal-back" id="authModal">
   <div class="modal">
     <button class="modal-close" id="authClose">×</button>
-    <h2 id="authTitle">Prihlásenie</h2>
-    <p class="m-sub" id="authSub">Prihlás sa pre direct chat cez kód.</p>
-    <div class="field"><label>E-mail</label><input type="email" id="authEmail" placeholder="ty@email.sk" autocomplete="email"></div>
+    <h2 id="authTitle">Log in</h2>
+    <p class="m-sub" id="authSub">Log in for direct chat by code.</p>
+    <div class="field"><label>E-mail</label><input type="email" id="authEmail" placeholder="you@email.com" autocomplete="email"></div>
     <div class="field"><label>Heslo</label><input type="password" id="authPass" placeholder="••••••••" autocomplete="current-password"></div>
-    <button class="btn-primary" id="authSubmit">Prihlásiť sa</button>
+    <button class="btn-primary" id="authSubmit">Log in</button>
     <div class="modal-err" id="authErr"></div>
-    <div class="auth-links" style="text-align:center"><a id="authSwitch">Nemáš účet? Zaregistruj sa</a></div>
+    <div class="auth-links" style="text-align:center"><a id="authSwitch">Don't have an account? Sign up</a></div>
   </div>
 </div>
 
@@ -308,14 +308,14 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
 <div class="modal-back" id="accountModal">
   <div class="modal">
     <button class="modal-close" id="accountClose">×</button>
-    <h2>Tvoj účet</h2>
+    <h2>Your account</h2>
     <p class="m-sub" id="accountEmail">—</p>
-    <div class="code-badge"><small>Tvoj kontaktný kód</small><b id="accountCode">------</b></div>
-    <p class="m-sub" style="margin-bottom:14px">Zdieľaj tento kód a ktokoľvek s účtom ťa môže priamo osloviť.</p>
-    <div class="field"><label>Pripojiť sa cez kód (direct chat)</label><input id="connectCode" placeholder="napr. NB-4F7B2K" style="text-transform:uppercase"></div>
-    <button class="btn-primary" id="directConnectBtn">Nadviazať direct chat</button>
+    <div class="code-badge"><small>Your contact code</small><b id="accountCode">------</b></div>
+    <p class="m-sub" style="margin-bottom:14px">Share this code and anyone with an account can reach you directly.</p>
+    <div class="field"><label>Connect by code (direct chat)</label><input id="connectCode" placeholder="e.g. NB-4F7B2K" style="text-transform:uppercase"></div>
+    <button class="btn-primary" id="directConnectBtn">Start direct chat</button>
     <div class="modal-err" id="accountErr"></div>
-    <div class="auth-links" style="text-align:center;margin-top:14px"><a id="logoutLink">Odhlásiť sa</a></div>
+    <div class="auth-links" style="text-align:center;margin-top:14px"><a id="logoutLink">Log out</a></div>
   </div>
 </div>
 
@@ -327,9 +327,9 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
 <script src="config.js"></script>
 <script>
 /* ============================================================
-   NEBULA — náhodný video/text chat (v1.0.0)
+   NEBULA — random video/text chat (v1.0.0)
    Firebase (Spark) signaling + WebRTC P2P.
-   Konfigurácia sa načítava z config.js
+   Configuration is loaded from config.js
    ============================================================ */
 firebase.initializeApp(FIREBASE_CONFIG);
 const auth = firebase.auth();
@@ -338,7 +338,7 @@ const FV = firebase.firestore.FieldValue;
 
 const S = {
   uid:null, isRegistered:false, email:null, myCode:null,
-  country:"Neznáma", flag:"🌍", countryCode:"",
+  country:"Unknown", flag:"🌍", countryCode:"",
   localStream:null, camOn:true, micOn:true, wantCamOnly:false,
   pc:null, roomId:null, isCaller:false, peer:null, mode:"idle",
   unsub:{}, searching:false, recorder:null, recChunks:[], recTimer:null, recStart:0, recCancelled:false,
@@ -367,7 +367,7 @@ async function detectCountry(){
 
 /* ============================================================ AUTH */
 auth.onAuthStateChanged(async user=>{
-  if(!user){ await auth.signInAnonymously().catch(e=>toast("Chyba prihlásenia: "+e.message,"err")); return; }
+  if(!user){ await auth.signInAnonymously().catch(e=>toast("Login error: "+e.message,"err")); return; }
   S.uid=user.uid; S.isRegistered=!user.isAnonymous; S.email=user.email;
   if(S.isRegistered) await ensureUserCode();
   updateUserPill();
@@ -384,16 +384,16 @@ async function ensureUserCode(){
   await ref.set({email:S.email,code,createdAt:FV.serverTimestamp()},{merge:true});
 }
 function updateUserPill(){
-  el("userPillText").textContent = S.isRegistered ? (S.email?.split("@")[0]||"Člen") : "Hosť";
+  el("userPillText").textContent = S.isRegistered ? (S.email?.split("@")[0]||"Member") : "Guest";
   el("userPill").querySelector(".dot").style.background = S.isRegistered ? "var(--green)" : "var(--muted-2)";
 }
 
 let authMode="login";
 function openAuth(mode){ authMode=mode; el("authModal").classList.add("open");
-  el("authTitle").textContent=mode==="login"?"Prihlásenie":"Vytvoriť účet";
-  el("authSub").textContent=mode==="login"?"Prihlás sa pre direct chat cez kód.":"Získaš vlastný kód pre priame kontakty.";
-  el("authSubmit").textContent=mode==="login"?"Prihlásiť sa":"Zaregistrovať sa";
-  el("authSwitch").textContent=mode==="login"?"Nemáš účet? Zaregistruj sa":"Už máš účet? Prihlás sa";
+  el("authTitle").textContent=mode==="login"?"Log in":"Create account";
+  el("authSub").textContent=mode==="login"?"Log in for direct chat by code.":"You'll get your own code for direct contacts.";
+  el("authSubmit").textContent=mode==="login"?"Log in":"Sign up";
+  el("authSwitch").textContent=mode==="login"?"Don't have an account? Sign up":"Already have an account? Log in";
   el("authErr").textContent=""; }
 el("loginLink").onclick=()=>openAuth("login");
 el("registerLink").onclick=()=>openAuth("register");
@@ -401,7 +401,7 @@ el("authSwitch").onclick=()=>openAuth(authMode==="login"?"register":"login");
 el("authClose").onclick=()=>el("authModal").classList.remove("open");
 el("authSubmit").onclick=async()=>{
   const email=el("authEmail").value.trim(), pass=el("authPass").value;
-  if(!email||pass.length<6){ el("authErr").textContent="Zadaj e-mail a heslo (min. 6 znakov)."; return; }
+  if(!email||pass.length<6){ el("authErr").textContent="Enter an email and password (min. 6 characters)."; return; }
   el("authSubmit").disabled=true;
   try{
     if(authMode==="register"){
@@ -409,14 +409,14 @@ el("authSubmit").onclick=async()=>{
       try{ await auth.currentUser.linkWithCredential(emailCred); }
       catch(e){ if(e.code==="auth/email-already-in-use") await auth.signInWithEmailAndPassword(email,pass); else throw e; }
     } else { await auth.signInWithEmailAndPassword(email,pass); }
-    el("authModal").classList.remove("open"); toast("Vitaj! 💜","ok");
+    el("authModal").classList.remove("open"); toast("Welcome! 💜","ok");
   }catch(e){ el("authErr").textContent=mapAuthErr(e.code)||e.message; }
   el("authSubmit").disabled=false;
 };
 function mapAuthErr(c){ return ({
-  "auth/invalid-email":"Neplatný e-mail.","auth/wrong-password":"Nesprávne heslo.",
-  "auth/user-not-found":"Účet neexistuje.","auth/email-already-in-use":"E-mail sa už používa — skús sa prihlásiť.",
-  "auth/weak-password":"Heslo je príliš slabé.","auth/invalid-credential":"Nesprávny e-mail alebo heslo."}[c]); }
+  "auth/invalid-email":"Invalid email.","auth/wrong-password":"Incorrect password.",
+  "auth/user-not-found":"Account doesn't exist.","auth/email-already-in-use":"Email already in use — try logging in.",
+  "auth/weak-password":"Password is too weak.","auth/invalid-credential":"Incorrect email or password."}[c]); }
 
 el("accountBtn").onclick=()=>{ if(!S.isRegistered){ openAuth("login"); return; }
   el("accountEmail").textContent=S.email; el("accountCode").textContent=S.myCode||"------"; el("accountModal").classList.add("open"); };
@@ -431,8 +431,8 @@ db.collection("config").doc("moderation").onSnapshot(snap=>{
   if(S.uid&&S.moderation.banned[S.uid]) handleBanned();
 },()=>{});
 function handleBanned(){ cleanupConnection(); leaveQueue(); showView("landing");
-  toast("Tvoj prístup bol zablokovaný moderátorom.","err");
-  el("startBtn").disabled=true; el("startBtn").textContent="Prístup zablokovaný"; }
+  toast("Your access has been blocked by a moderator.","err");
+  el("startBtn").disabled=true; el("startBtn").textContent="Access blocked"; }
 function filterText(txt){ let flagged=false,out=txt;
   for(const kw of S.moderation.keywords){ if(!kw)continue;
     const re=new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi");
@@ -446,7 +446,7 @@ async function getMedia(){
     S.localStream=await navigator.mediaDevices.getUserMedia({ video:S.camOn?{width:{ideal:1280,max:1280},height:{ideal:720,max:720},frameRate:{ideal:24,max:30}}:false, audio:true });
   }catch(e){
     try{ S.localStream=await navigator.mediaDevices.getUserMedia({video:false,audio:true}); S.camOn=false; }
-    catch(e2){ toast("Nepodarilo sa získať kameru/mikrofón. Skontroluj povolenia prehliadača.","err"); throw e2; }
+    catch(e2){ toast("Couldn't access camera/microphone. Check your browser permissions.","err"); throw e2; }
   }
   el("localVideo").srcObject=S.localStream; reflectMediaButtons(); return S.localStream;
 }
@@ -459,8 +459,8 @@ function reflectMediaButtons(){
 }
 function applyRemoteMedia(media){
   const tile=el("remoteTile"); const ph=tile.querySelector(".placeholder");
-  if(media && media.cam===false){ ph.textContent="Partner vypol kameru"; ph.classList.remove("hidden"); }
-  else { ph.textContent="Bez videa"; }
+  if(media && media.cam===false){ ph.textContent="Partner turned off camera"; ph.classList.remove("hidden"); }
+  else { ph.textContent="No video"; }
   el("remoteMuteBadge").classList.toggle("hidden", !(media && media.mic===false));
 }
 function updateMediaStatus(){
@@ -468,7 +468,7 @@ function updateMediaStatus(){
   const field = S.isCaller ? "callerMedia" : "calleeMedia";
   db.collection("rooms").doc(S.roomId).set({[field]:{cam:!!S.camOn,mic:!!S.micOn}},{merge:true}).catch(()=>{});
 }
-el("camToggle").onclick=()=>{ const t=S.localStream?.getVideoTracks?.()[0]; if(!t){toast("Kamera nie je dostupná.");return;} t.enabled=!t.enabled; reflectMediaButtons(); updateQueueFlags(); updateMediaStatus(); };
+el("camToggle").onclick=()=>{ const t=S.localStream?.getVideoTracks?.()[0]; if(!t){toast("Camera not available.");return;} t.enabled=!t.enabled; reflectMediaButtons(); updateQueueFlags(); updateMediaStatus(); };
 el("micToggle").onclick=()=>{ const t=S.localStream?.getAudioTracks?.()[0]; if(!t)return; t.enabled=!t.enabled; reflectMediaButtons(); updateMediaStatus(); };
 
 /* ============================================================ VIEWS */
@@ -487,13 +487,13 @@ el("stopBtn").onclick=()=>{ cleanupConnection(); leaveQueue(); showView("landing
 function setSearchingUI(on,sub){
   S.searching=on; el("searchingOverlay").style.display=on?"grid":"none"; el("nextBtn").disabled=on;
   if(sub) el("searchingSub").textContent=sub;
-  if(on){ el("peerName").textContent="Hľadám niekoho…"; el("peerCountry").textContent="—"; el("peerFlag").textContent="🌍"; el("peerAva").textContent="?"; el("remoteTile").classList.add("hidden"); el("videoGrid").className="videos solo"; clearMessages(); }
+  if(on){ el("peerName").textContent="Looking for someone…"; el("peerCountry").textContent="—"; el("peerFlag").textContent="🌍"; el("peerAva").textContent="?"; el("remoteTile").classList.add("hidden"); el("videoGrid").className="videos solo"; clearMessages(); }
 }
 async function startSearch(){ cleanupConnection(); setSearchingUI(true); await joinQueueAndMatch(); }
 async function nextPartner(){
   if(S.searching) return;
   if(S.roomId) db.collection("rooms").doc(S.roomId).set({ended:true,endedAt:FV.serverTimestamp()},{merge:true}).catch(()=>{});
-  cleanupConnection(); setSearchingUI(true,"Hľadám ďalšieho…"); await joinQueueAndMatch();
+  cleanupConnection(); setSearchingUI(true,"Looking for next…"); await joinQueueAndMatch();
 }
 function myQueueDoc(){ return { uid:S.uid,createdAt:FV.serverTimestamp(),matched:false,roomId:null,
   hasCamera:!!S.camOn,wantCamOnly:!!S.wantCamOnly,country:S.country,countryCode:S.countryCode,flag:S.flag,
@@ -560,8 +560,8 @@ function newPC(){
   });
   pc.ontrack=ev=>attachRemote(ev.streams[0]);
   pc.onconnectionstatechange=()=>{
-    if(pc.connectionState==="failed" && S.mode==="matched") addSys("Spojenie zlyhalo — skús Ďalej.");
-    if(pc.connectionState==="disconnected" && S.mode==="matched") addSys("Slabé spojenie… pokúšam sa obnoviť.");
+    if(pc.connectionState==="failed" && S.mode==="matched") addSys("Connection failed — try Next.");
+    if(pc.connectionState==="disconnected" && S.mode==="matched") addSys("Weak connection… trying to recover.");
   };
   return pc;
 }
@@ -617,14 +617,14 @@ async function startAsCallee(roomId){
 function selfInfo(){ return {uid:S.uid,country:S.country,flag:S.flag,countryCode:S.countryCode,isRegistered:S.isRegistered}; }
 function setPartner(info){
   S.peer=info||{};
-  const name=info.isRegistered?"Člen":"Neznámy";
-  el("peerName").textContent=name; el("peerCountry").textContent=info.country||"Neznáma krajina";
+  const name=info.isRegistered?"Member":"Unknown";
+  el("peerName").textContent=name; el("peerCountry").textContent=info.country||"Unknown country";
   el("peerFlag").textContent=info.flag||"🌍"; el("peerAva").textContent=info.flag||"?";
   const rt=el("remoteTile"); rt.querySelector(".pname").textContent=name; rt.querySelector(".flag").textContent=info.flag||"🌍";
 }
 function onMatched(){ S.searching=false; el("searchingOverlay").style.display="none";
-  addSys("Spojený s človekom "+(S.peer.flag||"🌍")+" "+(S.peer.country||"")); el("msgInput").focus(); }
-function partnerLeft(){ addSys("Partner odišiel ⏭"); cleanupConnection(); setSearchingUI(true,"Partner odišiel — hľadám ďalšieho…"); joinQueueAndMatch(); }
+  addSys("Connected with someone "+(S.peer.flag||"🌍")+" "+(S.peer.country||"")); el("msgInput").focus(); }
+function partnerLeft(){ addSys("Partner left ⏭"); cleanupConnection(); setSearchingUI(true,"Partner left — looking for next…"); joinQueueAndMatch(); }
 function cleanupConnection(){
   clearTimeout(S.retryHandle);
   ["room","cand","msg"].forEach(k=>{ if(S.unsub[k]){S.unsub[k]();S.unsub[k]=null;} });
@@ -651,7 +651,7 @@ function listenMessages(roomId){
 }
 function clearMessages(){
   const m = el("messages");
-  m.innerHTML = '<div class="chat-empty" id="chatEmpty">Správy sa zobrazia tu.<br>Buď slušný — chat je moderovaný. 💜</div>';
+  m.innerHTML = '<div class="chat-empty" id="chatEmpty">Messages will appear here.<br>Be kind — chat is moderated. 💜</div>';
 }
 function addSys(txt){ const d=document.createElement("div"); d.className="msg sys"; d.textContent=txt; el("messages").appendChild(d); scrollMsgs(); }
 function scrollMsgs(){ const m=el("messages"); m.scrollTop=m.scrollHeight; }
@@ -667,7 +667,7 @@ function renderMsg(m){
     d.querySelectorAll(".bars i").forEach((b,i)=>b.style.height=(25+Math.abs(Math.sin(i*1.3))*60)+"%");
   } else {
     const {out,flagged}=mine?{out:m.text,flagged:false}:filterText(m.text||"");
-    d.innerHTML=esc(out).replace(/\n/g,"<br>")+(flagged?' <span class="flt">(upravené)</span>':'');
+    d.innerHTML=esc(out).replace(/\n/g,"<br>")+(flagged?' <span class="flt">(edited)</span>':'');
   }
   el("messages").appendChild(d); scrollMsgs();
 }
@@ -680,15 +680,15 @@ async function sendText(){
   const {out}=filterText(raw);
   input.value=""; input.style.height="auto"; sendBtn.disabled=true;
   await db.collection("rooms").doc(S.roomId).collection("messages").add({from:S.uid,type:"text",text:out,t:FV.serverTimestamp()})
-    .catch(()=>toast("Správu sa nepodarilo odoslať.","err"));
+    .catch(()=>toast("Couldn't send the message.","err"));
 }
 
 /* ============================================================ EMOJI */
 const EMOJI={
-  "Smajlíky":["😀","😃","😄","😁","😆","😅","🤣","😂","🙂","🙃","😉","😊","😇","🥰","😍","🤩","😘","😗","😚","😋","😛","😜","🤪","😝","🤗","🤭","🤫","🤔","😐","😴","🥳","😎","🤓","🥺","😢","😭","😤","😡","🤯","😱","😳","🥵","🥶"],
-  "Gestá":["👍","👎","👏","🙌","🤝","🙏","💪","✌️","🤟","🤘","👌","🤌","👈","👉","👆","👇","☝️","✋","🖐️","🖖","👋","🤙","💅","👀"],
-  "Srdcia":["❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💔","❣️","💕","💞","💓","💗","💖","💘","💝","💯","✨","⭐","🌟","🔥","💥"],
-  "Objekty":["🎉","🎊","🎈","🎁","🌈","☀️","🌙","⚡","☕","🍕","🍔","🍟","🍩","🍺","🍷","🎵","🎧","📷","🎮","⚽","🏀","🚀","💎","👑"]
+  "Smileys":["😀","😃","😄","😁","😆","😅","🤣","😂","🙂","🙃","😉","😊","😇","🥰","😍","🤩","😘","😗","😚","😋","😛","😜","🤪","😝","🤗","🤭","🤫","🤔","😐","😴","🥳","😎","🤓","🥺","😢","😭","😤","😡","🤯","😱","😳","🥵","🥶"],
+  "Gestures":["👍","👎","👏","🙌","🤝","🙏","💪","✌️","🤟","🤘","👌","🤌","👈","👉","👆","👇","☝️","✋","🖐️","🖖","👋","🤙","💅","👀"],
+  "Hearts":["❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💔","❣️","💕","💞","💓","💗","💖","💘","💝","💯","✨","⭐","🌟","🔥","💥"],
+  "Objects":["🎉","🎊","🎈","🎁","🌈","☀️","🌙","⚡","☕","🍕","🍔","🍟","🍩","🍺","🍷","🎵","🎧","📷","🎮","⚽","🏀","🚀","💎","👑"]
 };
 function buildEmoji(){ const bar=el("emojiBar");
   for(const [cat,list] of Object.entries(EMOJI)){
@@ -700,11 +700,11 @@ el("emojiToggle").onclick=()=>el("emojiBar").classList.toggle("open");
 /* ============================================================ VOICE (max 60s) */
 const voiceBtn=el("voiceBtn");
 async function startRec(){
-  if(!S.roomId){ toast("Najprv sa spoj s niekým."); return; }
+  if(!S.roomId){ toast("Connect with someone first."); return; }
   let stream;
   try{ stream=S.localStream||await navigator.mediaDevices.getUserMedia({audio:true}); }
-  catch(e){ toast("Mikrofón nie je dostupný.","err"); return; }
-  const at=stream.getAudioTracks(); if(!at.length){ toast("Mikrofón nie je dostupný.","err"); return; }
+  catch(e){ toast("Microphone not available.","err"); return; }
+  const at=stream.getAudioTracks(); if(!at.length){ toast("Microphone not available.","err"); return; }
   const audioStream=new MediaStream(at);
   const mime=MediaRecorder.isTypeSupported("audio/webm;codecs=opus")?"audio/webm;codecs=opus":"audio/webm";
   S.recorder=new MediaRecorder(audioStream,{mimeType:mime}); S.recChunks=[]; S.recCancelled=false;
@@ -721,28 +721,28 @@ async function finishRec(){
   if(cancelled||!S.recChunks.length) return;
   const dur=Math.min(60,Math.round((Date.now()-S.recStart)/1000));
   const blob=new Blob(S.recChunks,{type:"audio/webm"});
-  if(blob.size>900*1024){ toast("Nahrávka je príliš veľká (skús kratšiu).","err"); return; }
+  if(blob.size>900*1024){ toast("Recording is too large (try a shorter one).","err"); return; }
   const b64=await new Promise(r=>{ const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(blob); });
   await db.collection("rooms").doc(S.roomId).collection("messages").add({from:S.uid,type:"voice",audio:b64,dur,t:FV.serverTimestamp()})
-    .catch(()=>toast("Hlasovú správu sa nepodarilo odoslať.","err"));
+    .catch(()=>toast("Couldn't send the voice message.","err"));
 }
 voiceBtn.onclick=()=>{ if(S.recorder) stopRec(); else startRec(); };
 el("recCancel").onclick=cancelRec;
 
 /* ============================================================ REPORT */
 el("reportBtn").onclick=async()=>{
-  if(!S.peer||!S.peer.uid){ toast("Nikto nie je pripojený."); return; }
+  if(!S.peer||!S.peer.uid){ toast("No one is connected."); return; }
   await db.collection("reports").add({reporter:S.uid,reported:S.peer.uid,roomId:S.roomId,country:S.peer.country||"",t:FV.serverTimestamp(),handled:false}).catch(()=>{});
-  toast("Nahlásené moderátorovi. Hľadám ďalšieho…","ok"); nextPartner();
+  toast("Reported to moderator. Looking for next…","ok"); nextPartner();
 };
 
 /* ============================================================ DIRECT CHAT (kód) */
 el("directConnectBtn").onclick=async()=>{
   const code=el("connectCode").value.trim().toUpperCase(); el("accountErr").textContent="";
-  if(!code){ el("accountErr").textContent="Zadaj kód."; return; }
-  if(code===S.myCode){ el("accountErr").textContent="To je tvoj vlastný kód 🙂"; return; }
+  if(!code){ el("accountErr").textContent="Enter a code."; return; }
+  if(code===S.myCode){ el("accountErr").textContent="That's your own code 🙂"; return; }
   const cSnap=await db.collection("codes").doc(code).get();
-  if(!cSnap.exists){ el("accountErr").textContent="Kód neexistuje."; return; }
+  if(!cSnap.exists){ el("accountErr").textContent="Code doesn't exist."; return; }
   const targetUid=cSnap.data().uid;
   el("accountModal").classList.remove("open");
   try{ await getMedia(); }catch(e){ return; }
@@ -750,7 +750,7 @@ el("directConnectBtn").onclick=async()=>{
   await startDirect("direct__"+[S.uid,targetUid].sort().join("__"), targetUid, code);
 };
 async function startDirect(roomId,targetUid,code){
-  cleanupConnection(); setSearchingUI(true,"Spájam priamo cez kód "+code+"…");
+  cleanupConnection(); setSearchingUI(true,"Connecting directly via code "+code+"…");
   const roomRef=db.collection("rooms").doc(roomId);
   const iAmCaller=S.uid<targetUid; S.isCaller=iAmCaller;
   setPartner({uid:targetUid,isRegistered:true,country:"",flag:"🌍"}); S.roomId=roomId; S.mode="matched";
@@ -775,7 +775,7 @@ async function startDirect(roomId,targetUid,code){
         const ans=await S.pc.createAnswer(); await S.pc.setLocalDescription(ans);
         await roomRef.set({answer:{type:ans.type,sdp:ans.sdp}},{merge:true}); } });
   }
-  listenMessages(roomId); onMatched(); toast("Direct chat cez kód "+code,"ok");
+  listenMessages(roomId); onMatched(); toast("Direct chat via code "+code,"ok");
 }
 
 /* ============================================================ PRESENCE */
