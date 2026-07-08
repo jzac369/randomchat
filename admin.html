@@ -338,6 +338,14 @@ textarea.legal-box{width:100%;min-height:140px;font-size:12.5px;line-height:1.5;
     </div>
 
     <div class="card full">
+      <h3>💌 Feedback &amp; messages <span class="count" id="feedbackCount">0</span></h3>
+      <div class="card-body tall">
+        <p style="color:var(--muted);font-size:12.5px;margin:0 0 10px">Sent via the "Send us a message" link on the main page.</p>
+        <div id="feedbackList"><div class="empty">No messages yet.</div></div>
+      </div>
+    </div>
+
+    <div class="card full">
       <h3>📝 Admin activity log</h3>
       <div class="card-body" id="adminLogList"><div class="empty">No actions yet.</div></div>
     </div>
@@ -600,8 +608,14 @@ function startAdmin(){
 
   const legalRef=db.collection("config").doc("legal");
   legalRef.get().then(snap=>{
-    if(!snap.exists){ legalRef.set({terms:DEFAULT_TERMS, privacy:DEFAULT_PRIVACY}); el("termsBox").value=DEFAULT_TERMS; el("privacyBox").value=DEFAULT_PRIVACY; }
-    else{ const d=snap.data(); el("termsBox").value=d.terms||DEFAULT_TERMS; el("privacyBox").value=d.privacy||DEFAULT_PRIVACY; }
+    const d = snap.exists ? (snap.data()||{}) : {};
+    const terms = d.terms || DEFAULT_TERMS;
+    const privacy = d.privacy || DEFAULT_PRIVACY;
+    el("termsBox").value = terms; el("privacyBox").value = privacy;
+    // Ak dokument ešte neexistoval, alebo existoval so starým/prázdnym textom (napr. z verzie
+    // spred tejto funkcie), rovno zapíšeme default text aj do Firestore — inak by ho hlavná
+    // stránka nikdy neuvidela, hoci v admin paneli je zobrazený.
+    if(!snap.exists || !d.terms || !d.privacy){ legalRef.set({terms, privacy}, {merge:true}); }
   });
   el("legalSaveBtn").onclick=async()=>{
     await legalRef.set({terms:el("termsBox").value, privacy:el("privacyBox").value});
@@ -834,6 +848,23 @@ function startAdmin(){
       const when=l.t&&l.t.toDate?l.t.toDate().toLocaleString():"";
       return '<div class="row-item"><span class="flag">📝</span><div class="info"><b>'+esc(friendlyLog(l.action,l.detail))+'</b><small>'+esc(l.byEmail)+' · '+when+'</small></div></div>';
     }).join("") : '<div class="empty">No actions yet.</div>';
+  },()=>{});
+
+  db.collection("feedback").orderBy("t","desc").limit(100).onSnapshot(sn=>{
+    const items=[]; sn.forEach(d=>items.push({id:d.id,...d.data()}));
+    el("feedbackCount").textContent = items.length;
+    el("feedbackList").innerHTML = items.length? items.map(function(f){
+      const when=f.t&&f.t.toDate?f.t.toDate().toLocaleString():"";
+      const contact=f.contact? ' · reply to: '+esc(f.contact) : '';
+      return '<div class="row-item" style="align-items:flex-start"><span class="flag">💌</span>'+
+        '<div class="info"><b>'+esc(f.nickname||"Anonymous")+' ('+esc(f.country||"?")+')</b>'+
+        '<small style="display:block;margin:4px 0;color:var(--text);white-space:pre-wrap">'+esc(f.text||"")+'</small>'+
+        '<small>'+when+contact+'</small></div>'+
+        '<button class="btn danger sm" data-fbdel="'+f.id+'">Delete</button></div>';
+    }).join("") : '<div class="empty">No messages yet.</div>';
+    el("feedbackList").querySelectorAll("[data-fbdel]").forEach(function(btn){
+      btn.onclick=async()=>{ await db.collection("feedback").doc(btn.getAttribute("data-fbdel")).delete(); toast("Deleted"); };
+    });
   },()=>{});
 }
 
