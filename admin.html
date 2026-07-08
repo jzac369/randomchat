@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>FreeChat · Admin</title>
+<title>Free2Chat · Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -41,6 +41,9 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
 .btn.danger{background:#fb5b6b1a;border-color:#fb5b6b55;color:#ff9ba6}
 .btn.danger:hover{background:#fb5b6b2a}
 .btn.sm{padding:6px 10px;font-size:12px;border-radius:8px}
+.feedback-bell{position:relative}
+.feedback-bell .badge-count{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;line-height:16px;border-radius:999px;text-align:center;padding:0 4px;animation:badgeBlink 1s infinite}
+@keyframes badgeBlink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.85)}}
 
 .gate{max-width:400px;margin:12vh auto;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:30px;box-shadow:var(--shadow)}
 .gate h2{margin:0 0 4px}
@@ -110,9 +113,9 @@ textarea.legal-box{width:100%;min-height:140px;font-size:12.5px;line-height:1.5;
 <body>
 
 <div id="gate" class="gate">
-  <div class="brand" style="margin-bottom:16px"><span class="orb"></span> Free<b>Chat</b> <span class="tag">ADMIN</span></div>
+  <div class="brand" style="margin-bottom:16px"><span class="orb"></span> Free2<b>Chat</b> <span class="tag">ADMIN</span></div>
   <h2>Moderator login</h2>
-  <label>Email</label><input id="gEmail" type="email" placeholder="admin@freechat.sk">
+  <label>Email</label><input id="gEmail" type="email" placeholder="admin@free2chat.sk">
   <label>Password</label><input id="gPass" type="password" placeholder="••••••••">
   <button class="btn pri" id="gBtn">Log in</button>
   <div class="err" id="gErr"></div>
@@ -120,8 +123,9 @@ textarea.legal-box{width:100%;min-height:140px;font-size:12.5px;line-height:1.5;
 
 <div id="panel" class="hidden">
   <div class="topbar">
-    <div class="brand"><span class="orb"></span> Free<b>Chat</b> <span class="tag">ADMIN</span></div>
+    <div class="brand"><span class="orb"></span> Free2<b>Chat</b> <span class="tag">ADMIN</span></div>
     <div class="spacer"></div>
+    <button class="btn sm feedback-bell hidden" id="feedbackBellBtn" title="New messages via Send us a message">✉️<span class="badge-count" id="feedbackBadge">0</span></button>
     <button class="btn sm" id="soundToggle" title="Toggle report sound alert">🔔 Sound on</button>
     <span class="top-email" id="topEmail"></span>
     <button class="btn" id="logoutBtn">Log out</button>
@@ -360,15 +364,17 @@ textarea.legal-box{width:100%;min-height:140px;font-size:12.5px;line-height:1.5;
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div style="background:#0c0a20;border-radius:14px;overflow:hidden;aspect-ratio:4/3;position:relative;border:1px solid var(--line)">
-        <video id="liveCallerVideo" autoplay playsinline style="width:100%;height:100%;object-fit:cover"></video>
+        <video id="liveCallerVideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover"></video>
         <span style="position:absolute;left:10px;bottom:10px;background:#0a0819cc;padding:4px 10px;border-radius:8px;font-size:12px" id="liveCallerLabel">Caller</span>
+        <button class="btn sm" id="liveCallerUnmute" style="position:absolute;right:10px;bottom:10px;padding:4px 9px;font-size:11px">🔇 Unmute</button>
       </div>
       <div style="background:#0c0a20;border-radius:14px;overflow:hidden;aspect-ratio:4/3;position:relative;border:1px solid var(--line)">
-        <video id="liveCalleeVideo" autoplay playsinline style="width:100%;height:100%;object-fit:cover"></video>
+        <video id="liveCalleeVideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover"></video>
         <span style="position:absolute;left:10px;bottom:10px;background:#0a0819cc;padding:4px 10px;border-radius:8px;font-size:12px" id="liveCalleeLabel">Callee</span>
+        <button class="btn sm" id="liveCalleeUnmute" style="position:absolute;right:10px;bottom:10px;padding:4px 9px;font-size:11px">🔇 Unmute</button>
       </div>
     </div>
-    <p style="color:var(--muted);font-size:12px;margin-top:14px">Video streams directly from the participants to you — closing this ends the extra connection on their side too.</p>
+    <p style="color:var(--muted);font-size:12px;margin-top:14px">Video streams directly from the participants to you — closing this ends the extra connection on their side too. Both previews start muted (browsers block autoplaying more than one video with sound at once) — click "Unmute" on either tile to hear it.</p>
   </div>
 </div>
 
@@ -408,8 +414,8 @@ const COUNTRY_LIST=[["US","United States"],["GB","United Kingdom"],["SK","Slovak
   COUNTRY_LIST.slice().sort((a,b)=>a[1].localeCompare(b[1])).forEach(function(c){ const o=document.createElement("option"); o.value=c[0]; o.textContent=flagOf(c[0])+" "+c[1]; sel.appendChild(o); });
 })();
 
-const DEFAULT_TERMS = "Last updated: (set by admin)\n\nBy using FreeChat, you agree to the following terms.\n\n1. Eligibility - You must be at least 18 years old to use this service.\n2. Nature of the service - FreeChat connects you with random strangers for live video and text chat. Conversations are not scripted or curated; you may encounter people whose views, behavior, or content you find objectionable. Use your own judgment.\n3. Acceptable use - You agree not to: share sexually explicit material involving minors (zero tolerance, reported to authorities where applicable); harass, threaten, or abuse other users; share others' personal information without consent; solicit money, advertise, or spam; broadcast illegal activity.\n4. Moderation - To keep the platform safe, FreeChat automatically scans text messages for prohibited keywords and personal contact information (emails, phone numbers), and periodically captures a low-resolution snapshot from your camera during an active chat for moderation review. Moderators may also view a live preview of an active chat when investigating a report. Violations may result in a temporary or permanent ban.\n5. No warranty - FreeChat is provided \"as is\" without warranties of any kind. We do not guarantee the identity, age, or intentions of other users.\n6. Limitation of liability - To the maximum extent permitted by law, FreeChat and its operators are not liable for damages arising from your use of the service or your interactions with other users.\n7. Termination - We may suspend or terminate your access at any time, with or without notice, for any violation of these terms.\n8. Changes - We may update these terms at any time. Continued use after changes constitutes acceptance.\n\nThis is a general template and not a substitute for legal advice tailored to your jurisdiction.";
-const DEFAULT_PRIVACY = "Last updated: (set by admin)\n\nThis policy explains what information FreeChat collects and how it's used.\n\n1. Information we collect\n- The nickname you choose (public, shown to chat partners)\n- Approximate country/location, derived from your IP address\n- Chat messages and voice messages you send during a session\n- Periodic low-resolution snapshots from your camera during an active chat, used for moderation\n- Basic technical information (browser type, approximate device information) that may be used to detect abuse\n- Reports you submit about other users\n\n2. How we use this information\n- To connect you with other users and operate the chat\n- To moderate content and enforce our Terms of Use (reviewing reports, automatic keyword/contact-info filtering, periodic camera snapshots)\n- To detect and prevent abuse across sessions\n\n3. What we don't do\n- We do not sell your personal information.\n- We do not permanently record full video calls; video/audio is transmitted directly between participants and is not stored, aside from the periodic low-resolution snapshots described above.\n\n4. Retention - Chat messages, snapshots, and session data are retained for a limited period for moderation purposes and may be deleted periodically.\n\n5. Your choices - You can end a chat at any time. You can choose not to enable your camera or microphone.\n\n6. Contact - Questions about this policy can be directed to the platform operator.\n\nThis is a general template and not a substitute for legal advice tailored to your jurisdiction or applicable data protection laws (e.g. GDPR).";
+const DEFAULT_TERMS = "Last updated: (set by admin)\n\nBy using Free2Chat, you agree to the following terms.\n\n1. Eligibility - You must be at least 18 years old to use this service.\n2. Nature of the service - Free2Chat connects you with random strangers for live video and text chat. Conversations are not scripted or curated; you may encounter people whose views, behavior, or content you find objectionable. Use your own judgment.\n3. Acceptable use - You agree not to: share sexually explicit material involving minors (zero tolerance, reported to authorities where applicable); harass, threaten, or abuse other users; share others' personal information without consent; solicit money, advertise, or spam; broadcast illegal activity.\n4. Moderation - To keep the platform safe, Free2Chat automatically scans text messages for prohibited keywords and personal contact information (emails, phone numbers), and periodically captures a low-resolution snapshot from your camera during an active chat for moderation review. Moderators may also view a live preview of an active chat when investigating a report. Violations may result in a temporary or permanent ban.\n5. No warranty - Free2Chat is provided \"as is\" without warranties of any kind. We do not guarantee the identity, age, or intentions of other users.\n6. Limitation of liability - To the maximum extent permitted by law, Free2Chat and its operators are not liable for damages arising from your use of the service or your interactions with other users.\n7. Termination - We may suspend or terminate your access at any time, with or without notice, for any violation of these terms.\n8. Changes - We may update these terms at any time. Continued use after changes constitutes acceptance.\n\nThis is a general template and not a substitute for legal advice tailored to your jurisdiction.";
+const DEFAULT_PRIVACY = "Last updated: (set by admin)\n\nThis policy explains what information Free2Chat collects and how it's used.\n\n1. Information we collect\n- The nickname you choose (public, shown to chat partners)\n- Approximate country/location, derived from your IP address\n- Chat messages and voice messages you send during a session\n- Periodic low-resolution snapshots from your camera during an active chat, used for moderation\n- Basic technical information (browser type, approximate device information) that may be used to detect abuse\n- Reports you submit about other users\n\n2. How we use this information\n- To connect you with other users and operate the chat\n- To moderate content and enforce our Terms of Use (reviewing reports, automatic keyword/contact-info filtering, periodic camera snapshots)\n- To detect and prevent abuse across sessions\n\n3. What we don't do\n- We do not sell your personal information.\n- We do not permanently record full video calls; video/audio is transmitted directly between participants and is not stored, aside from the periodic low-resolution snapshots described above.\n\n4. Retention - Chat messages, snapshots, and session data are retained for a limited period for moderation purposes and may be deleted periodically.\n\n5. Your choices - You can end a chat at any time. You can choose not to enable your camera or microphone.\n\n6. Contact - Questions about this policy can be directed to the platform operator.\n\nThis is a general template and not a substitute for legal advice tailored to your jurisdiction or applicable data protection laws (e.g. GDPR).";
 
 const ACTION_LABELS = {
   keyword_add: d=>'Added "'+d+'" to the blocked words list',
@@ -853,11 +859,15 @@ function startAdmin(){
   db.collection("feedback").orderBy("t","desc").limit(100).onSnapshot(sn=>{
     const items=[]; sn.forEach(d=>items.push({id:d.id,...d.data()}));
     el("feedbackCount").textContent = items.length;
+    const unread = items.filter(f=>!f.read);
+    el("feedbackBellBtn").classList.toggle("hidden", unread.length===0);
+    el("feedbackBadge").textContent = unread.length>99? "99+" : unread.length;
     el("feedbackList").innerHTML = items.length? items.map(function(f){
       const when=f.t&&f.t.toDate?f.t.toDate().toLocaleString():"";
       const contact=f.contact? ' · reply to: '+esc(f.contact) : '';
+      const newTag = !f.read? ' <span class="badge live" style="margin-left:6px">new</span>' : '';
       return '<div class="row-item" style="align-items:flex-start"><span class="flag">💌</span>'+
-        '<div class="info"><b>'+esc(f.nickname||"Anonymous")+' ('+esc(f.country||"?")+')</b>'+
+        '<div class="info"><b>'+esc(f.nickname||"Anonymous")+' ('+esc(f.country||"?")+')'+newTag+'</b>'+
         '<small style="display:block;margin:4px 0;color:var(--text);white-space:pre-wrap">'+esc(f.text||"")+'</small>'+
         '<small>'+when+contact+'</small></div>'+
         '<button class="btn danger sm" data-fbdel="'+f.id+'">Delete</button></div>';
@@ -865,7 +875,14 @@ function startAdmin(){
     el("feedbackList").querySelectorAll("[data-fbdel]").forEach(function(btn){
       btn.onclick=async()=>{ await db.collection("feedback").doc(btn.getAttribute("data-fbdel")).delete(); toast("Deleted"); };
     });
+    window._unreadFeedback = unread.map(f=>f.id);
   },()=>{});
+  el("feedbackBellBtn").onclick=async()=>{
+    const card=document.querySelector("#feedbackList").closest(".card");
+    if(card) card.scrollIntoView({behavior:"smooth",block:"start"});
+    const ids = window._unreadFeedback||[];
+    if(ids.length) await Promise.all(ids.map(id=>db.collection("feedback").doc(id).set({read:true},{merge:true}).catch(()=>{})));
+  };
 }
 
 function renderKeywords(list){
@@ -1009,6 +1026,11 @@ async function openLiveView(roomId, ci, ce){
   liveViewState.roomId=roomId;
   el("liveCallerLabel").textContent=(ci.flag||"🌍")+" Caller · "+(ci.country||"?");
   el("liveCalleeLabel").textContent=(ce.flag||"🌍")+" Callee · "+(ce.country||"?");
+  // Oba náhľady vždy štartujú stlmené — prehliadač by inak ticho zablokoval autoplay
+  // druhého neutlmeného videa (limit "jedno autoplay video so zvukom naraz"), čo
+  // vyzeralo, akoby druhá strana vôbec nemala video.
+  el("liveCallerVideo").muted=true; el("liveCallerUnmute").textContent="🔇 Unmute";
+  el("liveCalleeVideo").muted=true; el("liveCalleeUnmute").textContent="🔇 Unmute";
   el("liveViewModal").style.display="flex";
   const roles=["caller","callee"];
   for(let i=0;i<roles.length;i++){
@@ -1049,6 +1071,13 @@ function closeLiveView(){
   el("liveCallerVideo").srcObject=null; el("liveCalleeVideo").srcObject=null;
 }
 el("closeLiveView").onclick=closeLiveView;
+function toggleLiveMute(videoId, btnId){
+  const v=el(videoId), b=el(btnId);
+  v.muted=!v.muted;
+  b.textContent = v.muted? "🔇 Unmute" : "🔊 Mute";
+}
+el("liveCallerUnmute").onclick=()=>toggleLiveMute("liveCallerVideo","liveCallerUnmute");
+el("liveCalleeUnmute").onclick=()=>toggleLiveMute("liveCalleeVideo","liveCalleeUnmute");
 
 const COUNTRY_LATLNG={
   US:[38,-97],GB:[54,-2],SK:[48.7,19.7],CZ:[49.8,15.5],DE:[51.2,10.5],FR:[46.2,2.2],ES:[40.5,-3.7],
