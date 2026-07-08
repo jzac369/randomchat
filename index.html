@@ -136,6 +136,9 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
 .btn-primary:disabled{opacity:.55;cursor:not-allowed;transform:none}
 .age-note{margin-top:12px;font-size:11.5px;color:var(--muted-2)}
 .age-note a{color:var(--cyan);font-weight:600;text-decoration:none;cursor:pointer}
+.feedback-note{margin-top:8px;text-align:center;font-size:11px}
+.feedback-note a{color:var(--muted-2);text-decoration:none;cursor:pointer;border-bottom:1px dotted var(--muted-2);padding-bottom:1px}
+.feedback-note a:hover{color:var(--muted)}
 .seo-text{color:var(--muted-2);font-size:12px;max-width:560px;margin:16px auto 0;line-height:1.6}
 .blocked-note{color:var(--red);font-size:14px;font-weight:600;text-align:center;padding:20px}
 
@@ -220,7 +223,7 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
 .reaction-bar button:hover{background:var(--ov6);transform:scale(1.15)}
 .chat-empty{margin:auto;text-align:center;color:var(--muted-2);font-size:13px;padding:24px}
 
-.composer{padding:10px 12px;border-top:1px solid var(--line-soft);display:flex;flex-direction:column;gap:7px}
+.composer{padding:10px 12px;border-bottom:1px solid var(--line-soft);background:var(--ov2);display:flex;flex-direction:column;gap:7px}
 .emoji-bar{display:flex;gap:2px;flex-wrap:wrap;max-height:0;overflow:hidden;transition:max-height .25s}
 .emoji-bar.open{max-height:150px;overflow-y:auto;padding-bottom:4px}
 .emoji-bar button{width:34px;height:34px;border-radius:9px;font-size:19px;background:transparent}
@@ -325,6 +328,7 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
         </div>
         <button class="btn-primary" id="startBtn">Start random chat</button>
         <div class="age-note">By clicking you confirm you are 18+ and agree to behave respectfully. <a id="termsLink">Terms &amp; Privacy</a></div>
+        <div class="feedback-note"><a id="feedbackLink">Send us a message</a></div>
       </div>
       <p class="seo-text" id="seoText">
         FreeChat is a free random video chat website where you can meet new people instantly —
@@ -387,10 +391,6 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
           </div>
           <button class="rep" id="reportBtn" title="Report and skip">Report</button>
         </div>
-        <div class="typing-row hidden" id="typingRow"><span class="typing-dots"><i></i><i></i><i></i></span> typing…</div>
-        <div class="messages" id="messages">
-          <div class="chat-empty" id="chatEmpty">Messages will appear here. Be kind. 💜</div>
-        </div>
         <div class="composer">
           <div class="rec-ui" id="recUi">
             <span class="rdot"></span><span>Recording</span><span class="rtime" id="recTime">0:00</span>
@@ -406,6 +406,10 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
             <textarea id="msgInput" rows="1" placeholder="Type a message…"></textarea>
             <button class="send-btn" id="sendBtn" disabled>Send</button>
           </div>
+        </div>
+        <div class="typing-row hidden" id="typingRow"><span class="typing-dots"><i></i><i></i><i></i></span> typing…</div>
+        <div class="messages" id="messages">
+          <div class="chat-empty" id="chatEmpty">Messages will appear here. Be kind. 💜</div>
         </div>
       </div>
     </div>
@@ -431,6 +435,19 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
     <button class="modal-close" id="termsClose">×</button>
     <h2>Terms &amp; Privacy</h2>
     <div id="termsContent" style="font-size:13px;color:var(--muted);white-space:pre-wrap;line-height:1.6">Loading…</div>
+  </div>
+</div>
+
+<!-- FEEDBACK MODAL -->
+<div class="modal-back" id="feedbackModal">
+  <div class="modal" style="max-width:460px">
+    <button class="modal-close" id="feedbackClose">×</button>
+    <h2>Send us a message</h2>
+    <p class="m-sub" style="margin-bottom:14px">Found a bug, or have an idea to make FreeChat better? Let us know.</p>
+    <div class="field"><label>Your message</label><textarea id="feedbackText" rows="4" maxlength="1000" placeholder="What's on your mind?" style="width:100%;resize:vertical;background:var(--ov3);border:1px solid var(--line);border-radius:12px;color:var(--text);padding:10px 13px;font-family:inherit;font-size:14px;outline:none"></textarea></div>
+    <div class="field"><label>Contact (optional)</label><input type="text" id="feedbackContact" placeholder="Email, if you'd like a reply" maxlength="120"></div>
+    <button class="btn-primary" id="feedbackSend">Send</button>
+    <div id="feedbackSentNote" class="hidden" style="margin-top:12px;color:var(--green);font-size:13px;text-align:center">Thanks — your message was sent. 💜</div>
   </div>
 </div>
 
@@ -629,6 +646,11 @@ function logHistory(partnerNickname, country, flag){
 }
 
 /* ---------- terms & privacy ---------- */
+// Záložný text pre prípad, že admin ešte nikdy neotvoril admin.html (a teda ešte
+// nezapísal default text do config/legal). Rovnaký text ako DEFAULT_TERMS/DEFAULT_PRIVACY
+// v admin.html — ide len o poistku, aby návštevník nikdy nevidel "Not set."
+const FALLBACK_TERMS = "Last updated: (set by admin)\n\nBy using FreeChat, you agree to the following terms.\n\n1. Eligibility - You must be at least 18 years old to use this service.\n2. Nature of the service - FreeChat connects you with random strangers for live video and text chat. Conversations are not scripted or curated; you may encounter people whose views, behavior, or content you find objectionable. Use your own judgment.\n3. Acceptable use - You agree not to: share sexually explicit material involving minors (zero tolerance, reported to authorities where applicable); harass, threaten, or abuse other users; share others' personal information without consent; solicit money, advertise, or spam; broadcast illegal activity.\n4. Moderation - To keep the platform safe, FreeChat automatically scans text messages for prohibited keywords and personal contact information (emails, phone numbers), and periodically captures a low-resolution snapshot from your camera during an active chat for moderation review. Moderators may also view a live preview of an active chat when investigating a report. Violations may result in a temporary or permanent ban.\n5. No warranty - FreeChat is provided \"as is\" without warranties of any kind. We do not guarantee the identity, age, or intentions of other users.\n6. Limitation of liability - To the maximum extent permitted by law, FreeChat and its operators are not liable for damages arising from your use of the service or your interactions with other users.\n7. Termination - We may suspend or terminate your access at any time, with or without notice, for any violation of these terms.\n8. Changes - We may update these terms at any time. Continued use after changes constitutes acceptance.\n\nThis is a general template and not a substitute for legal advice tailored to your jurisdiction.";
+const FALLBACK_PRIVACY = "Last updated: (set by admin)\n\nThis policy explains what information FreeChat collects and how it's used.\n\n1. Information we collect\n- The nickname you choose (public, shown to chat partners)\n- Approximate country/location, derived from your IP address\n- Chat messages and voice messages you send during a session\n- Periodic low-resolution snapshots from your camera during an active chat, used for moderation\n- Basic technical information (browser type, approximate device information) that may be used to detect abuse\n- Reports you submit about other users\n\n2. How we use this information\n- To connect you with other users and operate the chat\n- To moderate content and enforce our Terms of Use (reviewing reports, automatic keyword/contact-info filtering, periodic camera snapshots)\n- To detect and prevent abuse across sessions\n\n3. What we don't do\n- We do not sell your personal information.\n- We do not permanently record full video calls; video/audio is transmitted directly between participants and is not stored, aside from the periodic low-resolution snapshots described above.\n\n4. Retention - Chat messages, snapshots, and session data are retained for a limited period for moderation purposes and may be deleted periodically.\n\n5. Your choices - You can end a chat at any time. You can choose not to enable your camera or microphone.\n\n6. Contact - Questions about this policy can be directed to the platform operator.\n\nThis is a general template and not a substitute for legal advice tailored to your jurisdiction or applicable data protection laws (e.g. GDPR).";
 let legalLoaded=false, legalCache=null;
 el("termsLink").onclick=async()=>{
   el("termsModal").classList.add("open");
@@ -636,11 +658,40 @@ el("termsLink").onclick=async()=>{
   try{
     const snap = await db.collection("config").doc("legal").get();
     legalCache = snap.data() || {};
-    el("termsContent").textContent = "TERMS OF USE\n\n"+(legalCache.terms||"Not set.")+"\n\n\nPRIVACY POLICY\n\n"+(legalCache.privacy||"Not set.");
+    el("termsContent").textContent = "TERMS OF USE\n\n"+(legalCache.terms||FALLBACK_TERMS)+"\n\n\nPRIVACY POLICY\n\n"+(legalCache.privacy||FALLBACK_PRIVACY);
     legalLoaded=true;
   }catch(e){ el("termsContent").textContent="Could not load."; }
 };
 el("termsClose").onclick=()=>el("termsModal").classList.remove("open");
+
+/* ---------- feedback ---------- */
+el("feedbackLink").onclick=()=>{
+  el("feedbackSentNote").classList.add("hidden");
+  el("feedbackText").value=""; el("feedbackContact").value="";
+  el("feedbackSend").disabled=false; el("feedbackSend").textContent="Send";
+  el("feedbackModal").classList.add("open");
+};
+el("feedbackClose").onclick=()=>el("feedbackModal").classList.remove("open");
+el("feedbackSend").onclick=async()=>{
+  const text = el("feedbackText").value.trim();
+  if(!text){ toast("Write a message first.","err"); return; }
+  el("feedbackSend").disabled=true; el("feedbackSend").textContent="Sending…";
+  try{
+    if(!S.uid && auth.currentUser) S.uid = auth.currentUser.uid;
+    await db.collection("feedback").add({
+      text, contact:(el("feedbackContact").value||"").trim(),
+      uid:S.uid||null, nickname:S.nickname||null, country:S.country||null,
+      page: S.mode||"landing", t:FV.serverTimestamp()
+    });
+    el("feedbackSentNote").classList.remove("hidden");
+    el("feedbackText").value=""; el("feedbackContact").value="";
+    el("feedbackSend").textContent="Send";
+    setTimeout(()=>el("feedbackModal").classList.remove("open"), 1400);
+  }catch(e){
+    toast("Couldn't send — try again.","err");
+    el("feedbackSend").disabled=false; el("feedbackSend").textContent="Send";
+  }
+};
 
 /* ---------- direct warning from moderator ---------- */
 function listenForWarnings(){
@@ -849,16 +900,34 @@ el("camSwitchBtn").onclick=async()=>{
   if(!S.localStream) return;
   const oldTrack = S.localStream.getVideoTracks()[0];
   const newFacing = S.facingMode==="user" ? "environment" : "user";
+  const btn = el("camSwitchBtn"); btn.disabled = true;
   try{
-    const newStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:newFacing},audio:false});
-    const newTrack = newStream.getVideoTracks()[0];
+    // Mnohé mobilné prehliadače nevedia mať otvorenú prednú aj zadnú kameru naraz —
+    // preto najprv uvoľníme starú kameru a AŽ POTOM si pýtame novú (predtým to bol
+    // dôvod, prečo prepnutie na mobile tíško zlyhávalo).
     if(oldTrack){ S.localStream.removeTrack(oldTrack); oldTrack.stop(); }
+    let newStream;
+    try{
+      newStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{exact:newFacing}},audio:false});
+    }catch(exactErr){
+      // Zariadenie/prehliadač nevie garantovať presnú kameru — skús aspoň "ideal".
+      newStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:newFacing},audio:false});
+    }
+    const newTrack = newStream.getVideoTracks()[0];
     S.localStream.addTrack(newTrack);
     el("localVideo").srcObject = S.localStream;
     S.facingMode = newFacing;
     if(S.pc){ const sender=S.pc.getSenders().find(s=>s.track&&s.track.kind==="video"); if(sender) await sender.replaceTrack(newTrack); }
     if(S.viewerPc){ const vs=S.viewerPc.getSenders().find(s=>s.track&&s.track.kind==="video"); if(vs) await vs.replaceTrack(newTrack); }
-  }catch(e){ toast("Could not switch camera.","err"); }
+  }catch(e){
+    toast("Could not switch camera.","err");
+    // Ak sa nová kamera nepodarilo získať, skús sa aspoň vrátiť k pôvodnej, nech používateľ nezostane bez videa.
+    try{
+      const fallback = await navigator.mediaDevices.getUserMedia({video:{facingMode:S.facingMode},audio:false});
+      S.localStream.addTrack(fallback.getVideoTracks()[0]);
+      el("localVideo").srcObject = S.localStream;
+    }catch(e2){}
+  }finally{ btn.disabled = false; }
 };
 el("dataSaverBtn").onclick=()=>{
   S.dataSaver=!S.dataSaver;
