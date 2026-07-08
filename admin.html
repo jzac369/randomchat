@@ -21,8 +21,8 @@ body{font-family:Inter,system-ui,sans-serif;color:var(--text);min-height:100vh;
   background:radial-gradient(1000px 600px at 10% -10%,#241a5e33,transparent 60%),radial-gradient(800px 500px at 100% 0,#0e5ca826,transparent 55%),var(--bg)}
 h1,h2,h3,.brand{font-family:"Space Grotesk",sans-serif}
 button{font-family:inherit;cursor:pointer;border:0;color:inherit}
-input,select{font-family:inherit;color:var(--text);background:#ffffff08;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;outline:none}
-input:focus,select:focus{border-color:#4b3f8c}
+input,select,textarea{font-family:inherit;color:var(--text);background:#ffffff08;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#4b3f8c}
 input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:pointer}
 ::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:#332b5e;border-radius:20px}
 .hidden{display:none!important}
@@ -43,7 +43,7 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
 .btn.sm{padding:6px 10px;font-size:12px;border-radius:8px}
 
 .gate{max-width:400px;margin:12vh auto;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:30px;box-shadow:var(--shadow)}
-.gate h2{margin:0 0 4px}.gate p{color:var(--muted);font-size:13.5px;margin:0 0 20px}
+.gate h2{margin:0 0 4px}
 .gate label{display:block;font-size:12.5px;color:var(--muted);margin:12px 0 6px;font-weight:600}
 .gate input{width:100%}
 .gate .btn{width:100%;margin-top:18px;padding:14px;font-size:15px}
@@ -59,20 +59,20 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
 @media(max-width:900px){.grid{grid-template-columns:1fr}}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:18px}
-.card h3{margin:0;padding:15px 18px;font-size:15px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:8px}
+.card h3{margin:0;padding:15px 18px;font-size:15px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .card h3 .count{margin-left:auto;font-size:12px;color:var(--muted);font-weight:500;background:#ffffff08;padding:3px 9px;border-radius:999px}
 .card-body{padding:16px 18px;max-height:420px;overflow-y:auto}
 .card-body.tall{max-height:none}
 .empty{color:var(--muted-2);font-size:13px;text-align:center;padding:24px 0}
 
 .add-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.add-row input{flex:1;min-width:140px}
+.add-row input,.add-row select{flex:1;min-width:120px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{display:inline-flex;align-items:center;gap:7px;background:#ffffff0a;border:1px solid var(--line);padding:6px 8px 6px 12px;border-radius:999px;font-size:13px}
 .chip button{width:20px;height:20px;border-radius:50%;background:#fb5b6b22;color:#ff9ba6;font-size:13px;display:grid;place-items:center}
 .chip button:hover{background:#fb5b6b44}
 
-.row-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line-soft)}
+.row-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
 .row-item:last-child{border-bottom:0}
 .row-item .flag{font-size:18px}
 .row-item .info{flex:1;min-width:0}
@@ -83,6 +83,7 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
 .badge.anon{background:#ffffff10;color:var(--muted)}
 .badge.wait{background:#fbbf2422;color:#ffd97a}
 .badge.live{background:#8b5cf622;color:#c4b3ff}
+.badge.warn{background:#fb5b6b22;color:#ff9ba6}
 
 .room-msgs{margin-top:8px;padding:10px;background:#0c0a20;border-radius:10px;max-height:150px;overflow-y:auto;font-size:12.5px;display:flex;flex-direction:column;gap:5px}
 .room-msg{display:flex;gap:8px;align-items:flex-start}
@@ -94,12 +95,16 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.ok{border-color:#34d39966}.toast.err{border-color:#fb5b6b66}
 .full{grid-column:1/-1}
-.settings-row{display:flex;flex-wrap:wrap;gap:22px}
+.settings-row{display:flex;flex-wrap:wrap;gap:18px 26px}
 .settings-row label{display:flex;align-items:center;gap:9px;font-size:13.5px}
+.settings-row .sub-input{display:flex;align-items:center;gap:8px;margin-left:8px}
+.settings-row .sub-input input{width:70px;padding:6px 8px}
 .legend{display:flex;gap:16px;margin-top:10px;font-size:12px;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
 .snap-thumb{width:96px;height:72px;object-fit:cover;border-radius:8px;cursor:zoom-in;border:1px solid var(--line);display:block}
+textarea.legal-box{width:100%;min-height:140px;font-size:12.5px;line-height:1.5;resize:vertical}
+.note-box{width:100%;margin-top:8px;font-size:12.5px;min-height:50px}
 </style>
 </head>
 <body>
@@ -107,8 +112,7 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
 <div id="gate" class="gate">
   <div class="brand" style="margin-bottom:16px"><span class="orb"></span> Free<b>Chat</b> <span class="tag">ADMIN</span></div>
   <h2>Moderator login</h2>
-  <p>Only accounts listed as admins have access.</p>
-  <label>Email</label><input id="gEmail" type="email" placeholder="admin@nebula.sk">
+  <label>Email</label><input id="gEmail" type="email" placeholder="admin@freechat.sk">
   <label>Password</label><input id="gPass" type="password" placeholder="••••••••">
   <button class="btn pri" id="gBtn">Log in</button>
   <div class="err" id="gErr"></div>
@@ -129,10 +133,11 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
       <div class="stat"><div class="n" id="sWaiting">—</div><div class="l">Waiting in queue</div></div>
       <div class="stat"><div class="n" id="sRooms">—</div><div class="l">Active chats</div></div>
       <div class="stat"><div class="n" id="sReports">—</div><div class="l">Unresolved reports</div></div>
+      <div class="stat"><div class="n" id="sNewToday">—</div><div class="l">New nicknames today</div></div>
     </div>
 
     <div class="card">
-      <h3>📢 Broadcast message</h3>
+      <h3>📢 Broadcast message (all visitors)</h3>
       <div class="card-body">
         <div class="add-row">
           <input id="broadcastInput" placeholder="Message shown to all online users…">
@@ -144,11 +149,47 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
     </div>
 
     <div class="card">
+      <h3>✉️ Private warning (one person)</h3>
+      <div class="card-body">
+        <div class="add-row">
+          <input id="warnNickInput" placeholder="Their nickname">
+          <input id="warnMsgInput" placeholder="Warning message" style="flex:2">
+          <button class="btn danger sm" id="warnSendBtn">Send warning</button>
+        </div>
+        <p style="color:var(--muted-2);font-size:12px;margin:0">Shows a modal only to that specific person, not to anyone else.</p>
+      </div>
+    </div>
+
+    <div class="card">
       <h3>⚙️ App settings</h3>
       <div class="card-body">
         <div class="settings-row">
-          <label><input type="checkbox" id="setCameraOnly"> Force camera-only matching for everyone</label>
+          <label><input type="checkbox" id="setCameraOnly"> Force camera-only matching</label>
+          <label><input type="checkbox" id="setShowOnline"> Show online count to visitors</label>
+          <label><input type="checkbox" id="setGames"> Enable waiting-room mini-games</label>
+          <label><input type="checkbox" id="setVoice"> Enable voice messages</label>
+          <label><input type="checkbox" id="setTextChat"> Enable text chat</label>
         </div>
+        <div class="settings-row" style="margin-top:16px">
+          <label><input type="checkbox" id="setMaintenance"> Maintenance mode</label>
+          <div class="sub-input"><input id="setMaintenanceMsg" placeholder="Message shown to visitors" style="width:220px"></div>
+        </div>
+        <div class="settings-row" style="margin-top:16px">
+          <label><input type="checkbox" id="setInactivity"> Warn inactive users</label>
+          <div class="sub-input">after <input id="setInactivityMin" type="number" min="1" value="10"> minutes</div>
+        </div>
+        <button class="btn pri sm" id="saveSettingsBtn" style="margin-top:16px">Save settings</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🌍 Blocked countries</h3>
+      <div class="card-body">
+        <div class="add-row">
+          <select id="blockCountrySelect"></select>
+          <button class="btn danger sm" id="blockCountryBtn">Block</button>
+        </div>
+        <div class="chips" id="blockedCountryChips"></div>
       </div>
     </div>
 
@@ -161,7 +202,7 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
             <button class="btn pri sm" id="kwAdd">Add</button>
           </div>
           <div class="chips" id="kwChips"></div>
-          <p style="color:var(--muted-2);font-size:12px;margin:14px 0 0">Words are automatically masked with asterisks in chat for all participants. Emails and phone numbers are always masked automatically.</p>
+          <p style="color:var(--muted-2);font-size:12px;margin:14px 0 0">Emails and phone numbers are always masked automatically, regardless of this list.</p>
         </div>
       </div>
 
@@ -177,7 +218,10 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
               <option value="86400000">24 hours</option>
               <option value="604800000">7 days</option>
             </select>
-            <button class="btn danger sm" id="banAdd">Block</button>
+          </div>
+          <div class="add-row">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px"><input type="checkbox" id="shadowCheck"> Shadowban (they won't be told — just can't match with anyone)</label>
+            <button class="btn danger sm" id="banAdd" style="margin-left:auto">Block</button>
           </div>
           <div id="banList"></div>
         </div>
@@ -235,6 +279,14 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
     </div>
 
     <div class="card full">
+      <h3>🕵️ Abuse detection — shared IPs / devices</h3>
+      <div class="card-body tall">
+        <p style="color:var(--muted);font-size:12.5px;margin:0 0 12px">Nicknames that share the same network (IP) or the same device fingerprint — a possible sign of ban evasion or multi-accounting.</p>
+        <div id="abuseList"><div class="empty">Nothing to flag right now.</div></div>
+      </div>
+    </div>
+
+    <div class="card full">
       <h3>🩺 Health check</h3>
       <div class="card-body">
         <p style="color:var(--muted);font-size:13px;margin:0 0 10px">
@@ -246,14 +298,13 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
           <div><div class="n" style="font-family:'Space Grotesk';font-size:24px;font-weight:700" id="healthVisitsToday">—</div><div style="color:var(--muted);font-size:12px">Visits today (our own count)</div></div>
           <div><div class="n" style="font-family:'Space Grotesk';font-size:24px;font-weight:700" id="healthChatsToday">—</div><div style="color:var(--muted);font-size:12px">Chats started today</div></div>
         </div>
-        <p style="color:var(--muted-2);font-size:11.5px;margin-top:10px">These are rough activity proxies we track ourselves, not official quota numbers.</p>
       </div>
     </div>
 
     <div class="card full">
       <h3>💬 Active chats <span class="count" id="roomCount">0</span></h3>
       <div class="card-body tall">
-        <input id="roomSearch" placeholder="Filter by country or UID…" style="width:100%;margin-bottom:12px">
+        <input id="roomSearch" placeholder="Filter by country, nickname or UID…" style="width:100%;margin-bottom:12px">
         <div id="roomList"><div class="empty">No active chats.</div></div>
       </div>
     </div>
@@ -270,7 +321,19 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
       <h3>👤 Active nicknames <span class="count" id="usersCount">0</span></h3>
       <div class="card-body tall">
         <input id="usersSearch" placeholder="Search by nickname…" style="width:100%;margin-bottom:12px">
-        <div id="usersList"><div class="empty">No users found.</div></div>
+        <div id="usersList"><div class="empty">No nicknames found.</div></div>
+      </div>
+    </div>
+
+    <div class="card full">
+      <h3>📜 Terms &amp; Privacy Policy editor</h3>
+      <div class="card-body tall">
+        <p style="color:var(--muted);font-size:12.5px;margin:0 0 10px">This is shown to visitors via the "Terms &amp; Privacy" link on the main page. Starting content is a generic template — have it reviewed for your jurisdiction before relying on it.</p>
+        <label style="font-size:12.5px;color:var(--muted);font-weight:600;display:block;margin-bottom:6px">Terms of Use</label>
+        <textarea class="legal-box" id="termsBox"></textarea>
+        <label style="font-size:12.5px;color:var(--muted);font-weight:600;display:block;margin:14px 0 6px">Privacy Policy</label>
+        <textarea class="legal-box" id="privacyBox"></textarea>
+        <button class="btn pri sm" id="legalSaveBtn" style="margin-top:14px">Save</button>
       </div>
     </div>
 
@@ -301,6 +364,16 @@ input[type=checkbox]{accent-color:var(--violet);width:17px;height:17px;cursor:po
   </div>
 </div>
 
+<div id="timelineModal" style="position:fixed;inset:0;background:#000000cc;z-index:110;display:none;align-items:center;justify-content:center;padding:20px">
+  <div style="max-width:600px;width:100%;max-height:82vh;overflow-y:auto;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <b style="font-size:15px">🚩 Incident timeline</b>
+      <button class="btn sm" id="closeTimeline">Close</button>
+    </div>
+    <div id="timelineBody"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <div id="lightbox" style="position:fixed;inset:0;background:#000000cc;z-index:100;display:none;align-items:center;justify-content:center;cursor:zoom-out" onclick="this.style.display='none'">
   <img id="lightboxImg" style="max-width:90vw;max-height:90vh;border-radius:12px;border:2px solid var(--line)">
@@ -320,6 +393,43 @@ function esc(s){ return (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>
 function short(uid){ return (uid||"").slice(0,10)+"…"; }
 function todayKey(){ return new Date().toISOString().slice(0,10); }
 const isAdminEmail = e => e && ADMIN_EMAILS.map(x=>x.toLowerCase()).includes(e.toLowerCase());
+
+const COUNTRY_LIST=[["US","United States"],["GB","United Kingdom"],["SK","Slovakia"],["CZ","Czechia"],["DE","Germany"],["FR","France"],["ES","Spain"],["IT","Italy"],["PL","Poland"],["NL","Netherlands"],["AT","Austria"],["HU","Hungary"],["RO","Romania"],["UA","Ukraine"],["RU","Russia"],["PT","Portugal"],["SE","Sweden"],["NO","Norway"],["FI","Finland"],["DK","Denmark"],["BE","Belgium"],["CH","Switzerland"],["IE","Ireland"],["GR","Greece"],["TR","Turkey"],["BR","Brazil"],["MX","Mexico"],["AR","Argentina"],["CA","Canada"],["AU","Australia"],["NZ","New Zealand"],["JP","Japan"],["KR","South Korea"],["CN","China"],["IN","India"],["ID","Indonesia"],["PH","Philippines"],["TH","Thailand"],["VN","Vietnam"],["ZA","South Africa"],["EG","Egypt"],["NG","Nigeria"],["IL","Israel"],["AE","United Arab Emirates"],["SA","Saudi Arabia"],["HR","Croatia"],["SI","Slovenia"],["BG","Bulgaria"],["RS","Serbia"],["LT","Lithuania"],["LV","Latvia"],["EE","Estonia"]];
+(function buildCountrySelect(){
+  const sel=el("blockCountrySelect");
+  COUNTRY_LIST.slice().sort((a,b)=>a[1].localeCompare(b[1])).forEach(function(c){ const o=document.createElement("option"); o.value=c[0]; o.textContent=flagOf(c[0])+" "+c[1]; sel.appendChild(o); });
+})();
+
+const DEFAULT_TERMS = "Last updated: (set by admin)\n\nBy using FreeChat, you agree to the following terms.\n\n1. Eligibility - You must be at least 18 years old to use this service.\n2. Nature of the service - FreeChat connects you with random strangers for live video and text chat. Conversations are not scripted or curated; you may encounter people whose views, behavior, or content you find objectionable. Use your own judgment.\n3. Acceptable use - You agree not to: share sexually explicit material involving minors (zero tolerance, reported to authorities where applicable); harass, threaten, or abuse other users; share others' personal information without consent; solicit money, advertise, or spam; broadcast illegal activity.\n4. Moderation - To keep the platform safe, FreeChat automatically scans text messages for prohibited keywords and personal contact information (emails, phone numbers), and periodically captures a low-resolution snapshot from your camera during an active chat for moderation review. Moderators may also view a live preview of an active chat when investigating a report. Violations may result in a temporary or permanent ban.\n5. No warranty - FreeChat is provided \"as is\" without warranties of any kind. We do not guarantee the identity, age, or intentions of other users.\n6. Limitation of liability - To the maximum extent permitted by law, FreeChat and its operators are not liable for damages arising from your use of the service or your interactions with other users.\n7. Termination - We may suspend or terminate your access at any time, with or without notice, for any violation of these terms.\n8. Changes - We may update these terms at any time. Continued use after changes constitutes acceptance.\n\nThis is a general template and not a substitute for legal advice tailored to your jurisdiction.";
+const DEFAULT_PRIVACY = "Last updated: (set by admin)\n\nThis policy explains what information FreeChat collects and how it's used.\n\n1. Information we collect\n- The nickname you choose (public, shown to chat partners)\n- Approximate country/location, derived from your IP address\n- Chat messages and voice messages you send during a session\n- Periodic low-resolution snapshots from your camera during an active chat, used for moderation\n- Basic technical information (browser type, approximate device information) that may be used to detect abuse\n- Reports you submit about other users\n\n2. How we use this information\n- To connect you with other users and operate the chat\n- To moderate content and enforce our Terms of Use (reviewing reports, automatic keyword/contact-info filtering, periodic camera snapshots)\n- To detect and prevent abuse across sessions\n\n3. What we don't do\n- We do not sell your personal information.\n- We do not permanently record full video calls; video/audio is transmitted directly between participants and is not stored, aside from the periodic low-resolution snapshots described above.\n\n4. Retention - Chat messages, snapshots, and session data are retained for a limited period for moderation purposes and may be deleted periodically.\n\n5. Your choices - You can end a chat at any time. You can choose not to enable your camera or microphone.\n\n6. Contact - Questions about this policy can be directed to the platform operator.\n\nThis is a general template and not a substitute for legal advice tailored to your jurisdiction or applicable data protection laws (e.g. GDPR).";
+
+const ACTION_LABELS = {
+  keyword_add: d=>'Added "'+d+'" to the blocked words list',
+  keyword_remove: d=>'Removed "'+d+'" from the blocked words list',
+  ban_uid: d=>'Banned user '+d,
+  ban_email: d=>'Banned email '+d,
+  unban_uid: d=>'Unbanned user '+d,
+  unban_email: d=>'Unbanned email '+d,
+  shadowban_uid: d=>'Shadowbanned user '+d+' (silently, they were not told)',
+  shadowban_email: d=>'Shadowbanned email '+d+' (silently)',
+  unshadowban_uid: d=>'Removed shadowban from user '+d,
+  unshadowban_email: d=>'Removed shadowban from email '+d,
+  broadcast_send: d=>'Sent a broadcast message to all visitors: "'+d+'"',
+  broadcast_clear: ()=>'Cleared the broadcast message',
+  settings_change: d=>'Changed app settings ('+d+')',
+  resolve_report: ()=>'Marked a report as resolved',
+  cleanup_stale: d=>'Cleaned up '+d+' abandoned chat session(s)',
+  end_chat: ()=>'Ended an active chat',
+  live_view_start: d=>'Started watching a live chat (room '+short(d)+')',
+  live_view_stop: d=>'Stopped watching a live chat (room '+short(d)+')',
+  export_reports_csv: d=>'Exported reports to a CSV file ('+d+')',
+  direct_warning: d=>'Sent a private warning to '+d,
+  note_save: d=>'Saved an internal note about '+d,
+  legal_save: ()=>'Updated the Terms of Use / Privacy Policy text',
+  country_block: d=>'Blocked visitors from '+d,
+  country_unblock: d=>'Unblocked visitors from '+d
+};
+function friendlyLog(action, detail){ const f=ACTION_LABELS[action]; return f ? f(detail) : (action+(detail?": "+detail:"")); }
 
 el("gBtn").onclick=async()=>{
   const email=el("gEmail").value.trim(), pass=el("gPass").value;
@@ -370,13 +480,13 @@ function startAdmin(){
     el("healthVisitsToday").textContent = d.visits||0;
     el("healthChatsToday").textContent = d.chats||0;
   },()=>{});
-  const modRef=db.collection("config").doc("moderation");
-  modRef.get().then(s=>{ if(!s.exists) modRef.set({blockedKeywords:[],bannedUsers:{},bannedEmails:{}}); });
 
+  const modRef=db.collection("config").doc("moderation");
+  modRef.get().then(s=>{ if(!s.exists) modRef.set({blockedKeywords:[],bannedUsers:{},bannedEmails:{},shadowbanned:{},shadowbannedEmails:{}}); });
   modRef.onSnapshot(snap=>{
-    const d=snap.data()||{blockedKeywords:[],bannedUsers:{},bannedEmails:{}};
+    const d=snap.data()||{};
     renderKeywords(d.blockedKeywords||[]);
-    renderBanned(d.bannedUsers||{}, d.bannedEmails||{});
+    renderBanned(d.bannedUsers||{}, d.bannedEmails||{}, d.shadowbanned||{}, d.shadowbannedEmails||{});
   });
 
   el("kwAdd").onclick=addKeyword;
@@ -393,16 +503,23 @@ function startAdmin(){
     const durMs=parseInt(el("banDuration").value,10);
     const val = durMs>0 ? (Date.now()+durMs) : true;
     const durLabel = el("banDuration").selectedOptions[0].text;
-    if(type==="uid"){ await modRef.set({bannedUsers:{[raw]:val}},{merge:true}); logAdminAction("ban_uid", raw+" ("+durLabel+")"); }
-    else { const email=raw.toLowerCase(); await modRef.set({bannedEmails:{[email]:val}},{merge:true}); logAdminAction("ban_email", email+" ("+durLabel+")"); }
-    el("banInput").value=""; toast("User blocked","ok");
+    const shadow = el("shadowCheck").checked;
+    const field = shadow ? (type==="uid"?"shadowbanned":"shadowbannedEmails") : (type==="uid"?"bannedUsers":"bannedEmails");
+    const key = type==="uid" ? raw : raw.toLowerCase();
+    await modRef.set({[field]:{[key]:val}},{merge:true});
+    logAdminAction((shadow?"shadowban_":"ban_")+type, key+" ("+durLabel+")");
+    el("banInput").value=""; el("shadowCheck").checked=false; toast(shadow?"Shadowbanned":"User blocked","ok");
   };
-
   window._removeKeyword=async(w)=>{ await modRef.set({blockedKeywords:FV.arrayRemove(w)},{merge:true}); logAdminAction("keyword_remove",w); toast("Removed"); };
   window._unban=async(type,key)=>{
     if(type==="uid") await modRef.update({["bannedUsers."+key]:FV.delete()});
     else await modRef.update({["bannedEmails."+key]:FV.delete()});
     logAdminAction("unban_"+type,key); toast("Unblocked","ok");
+  };
+  window._unshadow=async(type,key)=>{
+    if(type==="uid") await modRef.update({["shadowbanned."+key]:FV.delete()});
+    else await modRef.update({["shadowbannedEmails."+key]:FV.delete()});
+    logAdminAction("unshadowban_"+type,key); toast("Shadowban removed","ok");
   };
   window._ban=async(uid)=>{ await modRef.set({bannedUsers:{[uid]:true}},{merge:true}); logAdminAction("ban_uid",uid+" (permanent, quick-ban)"); toast("Blocked","ok"); };
 
@@ -421,23 +538,76 @@ function startAdmin(){
     logAdminAction("broadcast_clear",""); toast("Broadcast cleared");
   };
 
+  el("warnSendBtn").onclick=async()=>{
+    const nick=el("warnNickInput").value.trim(); const msg=el("warnMsgInput").value.trim();
+    if(!nick||!msg) return;
+    const key=nick.toLowerCase().replace(/\s+/g,"_");
+    const nSnap=await db.collection("nicknames").doc(key).get();
+    if(!nSnap.exists){ toast("Nickname not found or not currently active.","err"); return; }
+    const uid=nSnap.data().uid;
+    await db.collection("warnings").doc(uid).set({message:msg,active:true,t:FV.serverTimestamp()});
+    logAdminAction("direct_warning", nick);
+    toast("Warning sent to "+nick,"ok");
+    el("warnNickInput").value=""; el("warnMsgInput").value="";
+  };
+
   const settingsRef=db.collection("config").doc("appSettings");
-  let settingsLoaded=false;
+  let currentSettings={};
   settingsRef.onSnapshot(snap=>{
-    const s=snap.data()||{};
-    settingsLoaded=false;
-    el("setCameraOnly").checked = s.cameraOnlyForced===true;
-    settingsLoaded=true;
+    currentSettings=snap.data()||{};
+    el("setCameraOnly").checked = currentSettings.cameraOnlyForced===true;
+    el("setShowOnline").checked = currentSettings.showOnlineCount===true;
+    el("setGames").checked = currentSettings.waitingGameEnabled!==false;
+    el("setVoice").checked = currentSettings.voiceMessagesEnabled!==false;
+    el("setTextChat").checked = currentSettings.textChatEnabled!==false;
+    el("setMaintenance").checked = currentSettings.maintenanceMode===true;
+    el("setMaintenanceMsg").value = currentSettings.maintenanceMessage||"";
+    el("setInactivity").checked = currentSettings.inactivityEnabled===true;
+    el("setInactivityMin").value = currentSettings.inactivityMinutes||10;
+    renderBlockedCountries(currentSettings.blockedCountries||[]);
   });
-  function bindSetting(id,field){
-    el(id).onchange=async()=>{
-      if(!settingsLoaded) return;
-      const val=el(id).checked;
-      await settingsRef.set({[field]:val},{merge:true});
-      logAdminAction("settings_change",field+"="+val); toast("Setting updated","ok");
-    };
+  el("saveSettingsBtn").onclick=async()=>{
+    await settingsRef.set({
+      cameraOnlyForced: el("setCameraOnly").checked,
+      showOnlineCount: el("setShowOnline").checked,
+      waitingGameEnabled: el("setGames").checked,
+      voiceMessagesEnabled: el("setVoice").checked,
+      textChatEnabled: el("setTextChat").checked,
+      maintenanceMode: el("setMaintenance").checked,
+      maintenanceMessage: el("setMaintenanceMsg").value.trim(),
+      inactivityEnabled: el("setInactivity").checked,
+      inactivityMinutes: parseInt(el("setInactivityMin").value,10)||10
+    },{merge:true});
+    logAdminAction("settings_change","saved from panel");
+    toast("Settings saved","ok");
+  };
+  el("blockCountryBtn").onclick=async()=>{
+    const cc=el("blockCountrySelect").value;
+    await settingsRef.set({blockedCountries:FV.arrayUnion(cc)},{merge:true});
+    logAdminAction("country_block", cc);
+    toast("Country blocked","ok");
+  };
+  window._unblockCountry=async(cc)=>{
+    await settingsRef.set({blockedCountries:FV.arrayRemove(cc)},{merge:true});
+    logAdminAction("country_unblock", cc);
+    toast("Country unblocked","ok");
+  };
+  function renderBlockedCountries(list){
+    el("blockedCountryChips").innerHTML = list.length? list.map(function(cc){
+      return '<span class="chip">'+flagOf(cc)+' '+cc+'<button onclick="_unblockCountry(\''+cc+'\')">×</button></span>';
+    }).join("") : '<div class="empty">No countries blocked.</div>';
   }
-  bindSetting("setCameraOnly","cameraOnlyForced");
+
+  const legalRef=db.collection("config").doc("legal");
+  legalRef.get().then(snap=>{
+    if(!snap.exists){ legalRef.set({terms:DEFAULT_TERMS, privacy:DEFAULT_PRIVACY}); el("termsBox").value=DEFAULT_TERMS; el("privacyBox").value=DEFAULT_PRIVACY; }
+    else{ const d=snap.data(); el("termsBox").value=d.terms||DEFAULT_TERMS; el("privacyBox").value=d.privacy||DEFAULT_PRIVACY; }
+  });
+  el("legalSaveBtn").onclick=async()=>{
+    await legalRef.set({terms:el("termsBox").value, privacy:el("privacyBox").value});
+    logAdminAction("legal_save","");
+    toast("Terms & Privacy saved","ok");
+  };
 
   db.collection("presence").onSnapshot(sn=>{ const now=Date.now(); let c=0; const byCountry={};
     sn.forEach(d=>{ const p=d.data(); const t=p.t; if(t&&t.toMillis&&now-t.toMillis()<45000){ c++;
@@ -480,6 +650,7 @@ function startAdmin(){
     const q=el("roomSearch").value.trim().toLowerCase();
     const f=r=>{ if(!q) return true; const ci=r.callerInfo||{}, ce=r.calleeInfo||{};
       return (ci.country||"").toLowerCase().includes(q) || (ce.country||"").toLowerCase().includes(q)
+        || (ci.nickname||"").toLowerCase().includes(q) || (ce.nickname||"").toLowerCase().includes(q)
         || (r.caller||"").toLowerCase().includes(q) || (ci.uid||"").toLowerCase().includes(q) || (ce.uid||"").toLowerCase().includes(q); };
     renderRooms(lastLiveRooms.filter(f), lastStaleRooms.filter(f));
   }
@@ -501,10 +672,10 @@ function startAdmin(){
     renderReports(filtered);
   }
   el("exportReportsBtn").onclick=()=>{
-    const rows=[["Time","Reporter","Reported","Room","Country","Status"]];
+    const rows=[["Time","Reporter","Reported","Room","Country","Reason","Status"]];
     lastReports.forEach(r=>{
       const t=r.t&&r.t.toDate?r.t.toDate().toISOString():"";
-      rows.push([t,r.reporter||"",r.reported||"",r.roomId||"",r.country||"",r.handled?"resolved":"open"]);
+      rows.push([t,r.reporter||"",r.reported||"",r.roomId||"",r.country||"",r.reason||"",r.handled?"resolved":"open"]);
     });
     const csv=rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\n");
     const blob=new Blob([csv],{type:"text/csv"});
@@ -581,14 +752,21 @@ function startAdmin(){
       const sorted=durations.slice().sort(function(a,b){return a-b;});
       const median=sorted[Math.floor(sorted.length/2)];
       function fmt(s){ return Math.floor(s/60)+"m "+Math.round(s%60)+"s"; }
-      statsHtml='<div style="display:flex;gap:24px;margin-bottom:14px;font-size:13px;color:var(--muted)">'+
+      statsHtml='<div style="display:flex;gap:24px;margin-bottom:14px;font-size:13px;color:var(--muted);flex-wrap:wrap">'+
         '<span>Avg. duration: <b style="color:var(--text)">'+fmt(avg)+'</b></span>'+
-        '<span>Median: <b style="color:var(--text)">'+fmt(median)+'</b></span></div>';
+        '<span>Median: <b style="color:var(--text)">'+fmt(median)+'</b></span>'+
+        '<span>Total chats shown: <b style="color:var(--text)">'+historyItems.length+'</b></span></div>';
     }
     const rows = historyItems.length? historyItems.map(function(r){
       const ci=r.callerInfo||{}, ce=r.calleeInfo||{};
-      const when=r.endedAt&&r.endedAt.toDate?r.endedAt.toDate().toLocaleString():"?";
-      return '<div class="row-item"><span class="flag">'+(ci.flag||"🌍")+'</span><div class="info"><b>'+esc(ci.nickname||"Anonymous")+' ↔ '+esc(ce.nickname||"Anonymous")+'</b><small>'+esc(ci.country||"?")+' ↔ '+esc(ce.country||"?")+' · '+when+' · mode: '+(r.mode||"random")+'</small></div></div>';
+      const start=r.createdAt&&r.createdAt.toDate?r.createdAt.toDate().toLocaleString():"?";
+      const end=r.endedAt&&r.endedAt.toDate?r.endedAt.toDate().toLocaleString():"?";
+      let durTxt="?";
+      if(r.createdAt&&r.createdAt.toMillis&&r.endedAt&&r.endedAt.toMillis){
+        const d=Math.max(0,(r.endedAt.toMillis()-r.createdAt.toMillis())/1000);
+        durTxt=Math.floor(d/60)+"m "+Math.round(d%60)+"s";
+      }
+      return '<div class="row-item"><span class="flag">'+(ci.flag||"🌍")+'</span><div class="info"><b>'+esc(ci.nickname||"Anonymous")+' ↔ '+esc(ce.nickname||"Anonymous")+'</b><small>'+esc(ci.country||"?")+' ↔ '+esc(ce.country||"?")+' · started '+start+' · ended '+end+' · duration '+durTxt+' · '+(r.messageCount||0)+' messages · mode: '+(r.mode||"random")+'</small></div></div>';
     }).join("") : '<div class="empty">No history yet.</div>';
     el("historyList").innerHTML = statsHtml + rows;
   }
@@ -600,27 +778,61 @@ function startAdmin(){
     db.collection("nicknames").limit(300).get().then(snap=>{
       allUsers=[]; snap.forEach(d=>allUsers.push({key:d.id,...d.data()}));
       el("usersCount").textContent=allUsers.length;
+      const today=todayKey();
+      const newToday=allUsers.filter(function(u){ return u.firstSeen && u.firstSeen.toDate && u.firstSeen.toDate().toISOString().slice(0,10)===today; });
+      el("sNewToday").textContent=newToday.length;
       renderUsers();
+      renderAbuse();
     }).catch(()=>{ el("usersList").innerHTML='<div class="empty">Could not load nicknames.</div>'; });
   }
   function renderUsers(){
     const q=el("usersSearch").value.trim().toLowerCase();
     const now=Date.now();
     const filtered=allUsers.filter(u=>!q||(u.nickname||"").toLowerCase().includes(q));
-    el("usersList").innerHTML = filtered.length? filtered.map(function(u){
+    el("usersList").innerHTML="";
+    filtered.forEach(function(u){
       const isLive = u.t && u.t.toMillis && (now-u.t.toMillis())<45000;
       const since=u.t&&u.t.toDate?u.t.toDate().toLocaleString():"?";
-      return '<div class="row-item"><span class="flag">👤</span><div class="info"><b>'+esc(u.nickname||u.key)+'</b><small>'+(u.status?esc(u.status)+' · ':'')+'active since '+since+'</small></div><span class="badge '+(isLive?'reg':'anon')+'">'+(isLive?'online':'offline')+'</span></div>';
-    }).join("") : '<div class="empty">No nicknames found.</div>';
+      const box=document.createElement("div"); box.className="row-item"; box.style.flexDirection="column"; box.style.alignItems="stretch";
+      box.innerHTML='<div style="display:flex;align-items:center;gap:10px;width:100%"><span class="flag">👤</span><div class="info"><b>'+esc(u.nickname||u.key)+'</b><small>'+(u.status?esc(u.status)+' · ':'')+'active since '+since+' · ip: '+esc(u.ip||"?")+'</small></div><span class="badge '+(isLive?'reg':'anon')+'">'+(isLive?'online':'offline')+'</span><button class="btn sm" data-note="'+u.key+'">Note</button></div>'+
+        '<textarea class="note-box hidden" id="note_'+u.key+'" placeholder="Internal note (only you can see this)"></textarea>';
+      el("usersList").appendChild(box);
+      box.querySelector("[data-note]").onclick=async()=>{
+        const box2=el("note_"+u.key);
+        box2.classList.toggle("hidden");
+        if(!box2.classList.contains("hidden") && !box2.value){
+          const snap=await db.collection("adminNotes").doc(u.key).get();
+          box2.value = snap.exists? (snap.data().note||"") : "";
+          box2.onblur=async()=>{
+            await db.collection("adminNotes").doc(u.key).set({note:box2.value,updatedAt:FV.serverTimestamp()});
+            logAdminAction("note_save", u.nickname||u.key);
+          };
+        }
+      };
+    });
+    if(!filtered.length) el("usersList").innerHTML='<div class="empty">No nicknames found.</div>';
   }
   el("usersSearch").addEventListener("input",renderUsers);
   loadUsers();
+  setInterval(loadUsers, 30000);
+
+  function renderAbuse(){
+    const byIp={}, byFp={};
+    allUsers.forEach(function(u){
+      if(u.ip){ (byIp[u.ip]=byIp[u.ip]||[]).push(u.nickname||u.key); }
+      if(u.fp){ (byFp[u.fp]=byFp[u.fp]||[]).push(u.nickname||u.key); }
+    });
+    const rows=[];
+    Object.keys(byIp).forEach(function(ip){ if(byIp[ip].length>1) rows.push('<div class="row-item"><span class="flag">🌐</span><div class="info"><b>Same IP</b><small>'+esc(ip)+' → '+byIp[ip].map(esc).join(", ")+'</small></div></div>'); });
+    Object.keys(byFp).forEach(function(fp){ if(byFp[fp].length>1) rows.push('<div class="row-item"><span class="flag">📱</span><div class="info"><b>Same device fingerprint</b><small>'+byFp[fp].map(esc).join(", ")+'</small></div></div>'); });
+    el("abuseList").innerHTML = rows.length? rows.join("") : '<div class="empty">Nothing to flag right now.</div>';
+  }
 
   db.collection("adminLogs").orderBy("t","desc").limit(40).onSnapshot(sn=>{
     const items=[]; sn.forEach(d=>items.push(d.data()));
     el("adminLogList").innerHTML = items.length? items.map(function(l){
       const when=l.t&&l.t.toDate?l.t.toDate().toLocaleString():"";
-      return '<div class="row-item"><span class="flag">📝</span><div class="info"><b>'+esc(l.action)+'</b><small>'+esc(l.detail)+' · '+esc(l.byEmail)+' · '+when+'</small></div></div>';
+      return '<div class="row-item"><span class="flag">📝</span><div class="info"><b>'+esc(friendlyLog(l.action,l.detail))+'</b><small>'+esc(l.byEmail)+' · '+when+'</small></div></div>';
     }).join("") : '<div class="empty">No actions yet.</div>';
   },()=>{});
 }
@@ -631,10 +843,12 @@ function renderKeywords(list){
     '<span class="chip">'+esc(w)+'<button onclick="_removeKeyword(\''+esc(w)+'\')">×</button></span>').join("")
     : '<div class="empty">No blocked words.</div>';
 }
-function renderBanned(usersMap, emailsMap){
+function renderBanned(usersMap, emailsMap, shadowMap, shadowEmailsMap){
   const uidEntries=Object.entries(usersMap||{}).filter(function(e){return e[1];});
   const emailEntries=Object.entries(emailsMap||{}).filter(function(e){return e[1];});
-  el("banCount").textContent=uidEntries.length+emailEntries.length;
+  const shadowEntries=Object.entries(shadowMap||{}).filter(function(e){return e[1];});
+  const shadowEmailEntries=Object.entries(shadowEmailsMap||{}).filter(function(e){return e[1];});
+  el("banCount").textContent=uidEntries.length+emailEntries.length+shadowEntries.length+shadowEmailEntries.length;
   function fmtExp(v){ return v===true?"Permanent":(Date.now()<v?"until "+new Date(v).toLocaleString():"expired"); }
   const rows=[];
   uidEntries.forEach(function(e){ var uid=e[0], val=e[1];
@@ -642,6 +856,12 @@ function renderBanned(usersMap, emailsMap){
   });
   emailEntries.forEach(function(e){ var email=e[0], val=e[1];
     rows.push('<div class="row-item"><span class="flag">✉️</span><div class="info"><b>'+esc(email)+'</b><small>Email · '+fmtExp(val)+'</small></div><button class="btn sm" onclick="_unban(\'email\',\''+esc(email)+'\')">Unblock</button></div>');
+  });
+  shadowEntries.forEach(function(e){ var uid=e[0], val=e[1];
+    rows.push('<div class="row-item"><span class="flag">👻</span><div class="info"><b>'+short(uid)+'</b><small>UID · Shadowban · '+fmtExp(val)+'</small></div><button class="btn sm" onclick="_unshadow(\'uid\',\''+esc(uid)+'\')">Remove</button></div>');
+  });
+  shadowEmailEntries.forEach(function(e){ var email=e[0], val=e[1];
+    rows.push('<div class="row-item"><span class="flag">👻</span><div class="info"><b>'+esc(email)+'</b><small>Email · Shadowban · '+fmtExp(val)+'</small></div><button class="btn sm" onclick="_unshadow(\'email\',\''+esc(email)+'\')">Remove</button></div>');
   });
   el("banList").innerHTML = rows.length? rows.join("") : '<div class="empty">No one is blocked.</div>';
 }
@@ -653,10 +873,39 @@ function renderQueue(items){
 function renderReports(reps){
   el("reportList").innerHTML = reps.length? reps.map(function(r){
     return '<div class="row-item"><span class="flag">🚩</span><div class="info"><b>'+esc(r.country||"?")+' · '+(r.handled?'resolved':'new')+'</b><small>reported: '+short(r.reported)+' · reason: '+esc(r.reason||"unspecified")+'</small></div>'+
+      '<button class="btn sm" onclick="_timeline(\''+r.id+'\',\''+esc(r.roomId||"")+'\')">Timeline</button>'+
       (r.handled?'':'<button class="btn danger sm" onclick="_ban(\''+esc(r.reported)+'\')">Ban</button><button class="btn sm" onclick="_resolve(\''+r.id+'\')">Resolve</button>')+'</div>';
   }).join("") : '<div class="empty">No reports match this filter.</div>';
 }
 window._resolve=async(id)=>{ await db.collection("reports").doc(id).update({handled:true}); logAdminAction("resolve_report",id); toast("Resolved","ok"); };
+
+window._timeline=async(reportId, roomId)=>{
+  el("timelineModal").style.display="flex";
+  el("timelineBody").innerHTML='<div class="empty">Loading…</div>';
+  if(!roomId){ el("timelineBody").innerHTML='<div class="empty">No room linked to this report.</div>'; return; }
+  try{
+    const roomSnap = await db.collection("rooms").doc(roomId).get();
+    const room = roomSnap.exists? roomSnap.data() : {};
+    const msgSnap = await db.collection("rooms").doc(roomId).collection("messages").orderBy("t","asc").get();
+    let html = '<div style="font-size:13px;color:var(--muted);margin-bottom:14px">Room: '+short(roomId)+' · mode: '+(room.mode||"?")+'</div>';
+    const snaps=[];
+    if(room.callerSnapshot) snaps.push(room.callerSnapshot);
+    if(room.calleeSnapshot) snaps.push(room.calleeSnapshot);
+    if(snaps.length) html += '<div style="display:flex;gap:8px;margin-bottom:14px">'+snaps.map(function(s){ return '<img class="snap-thumb" src="'+s+'" onclick="event.stopPropagation();openLightbox(this.src)">'; }).join("")+'</div>';
+    html += '<div class="room-msgs" style="max-height:300px">';
+    if(msgSnap.empty) html += '<div class="empty">No messages.</div>';
+    msgSnap.forEach(function(m){
+      const d=m.data();
+      const who = d.from===room.caller ? "Caller" : "Callee";
+      const when = d.t&&d.t.toDate? d.t.toDate().toLocaleTimeString() : "";
+      const body = d.type==="voice" ? "🎙️ voice message" : esc(d.text||"");
+      html += '<div class="room-msg"><span class="who">'+who+'</span><span>'+body+'</span><span style="margin-left:auto;color:var(--muted-2);font-size:11px">'+when+'</span></div>';
+    });
+    html += '</div>';
+    el("timelineBody").innerHTML = html;
+  }catch(e){ el("timelineBody").innerHTML='<div class="empty">Could not load timeline.</div>'; }
+};
+el("closeTimeline").onclick=()=>{ el("timelineModal").style.display="none"; };
 
 const roomUnsubs={};
 function renderRooms(rooms, staleRooms){
@@ -671,7 +920,7 @@ function renderRooms(rooms, staleRooms){
     host.appendChild(note);
     note.querySelector("#cleanupStaleBtn").onclick=async()=>{
       await Promise.all(staleRooms.map(r=>db.collection("rooms").doc(r.id).set({ended:true,endedAt:FV.serverTimestamp()},{merge:true})));
-      logAdminAction("cleanup_stale", staleRooms.length+" rooms");
+      logAdminAction("cleanup_stale", staleRooms.length);
       toast("Stale sessions cleaned up","ok");
     };
   }
@@ -685,10 +934,11 @@ function renderRooms(rooms, staleRooms){
     const snapHtml = snaps.length? '<div style="display:flex;gap:8px;margin:2px 0 8px">'+snaps.map(function(s){
       return '<div style="position:relative"><img class="snap-thumb" src="'+s.src+'"><span style="position:absolute;left:4px;bottom:4px;font-size:11px;background:#0a0819cc;padding:1px 6px;border-radius:6px">'+s.label+'</span></div>';
     }).join("")+'</div>' : "";
+    const started = r.createdAt&&r.createdAt.toDate? r.createdAt.toDate().toLocaleTimeString() : "?";
     box.innerHTML='<div style="display:flex;align-items:center;gap:12px;width:100%;flex-wrap:wrap">'+
         '<span class="flag">'+(ci.flag||"🌍")+'</span>'+
         '<div class="info"><b>'+esc(ci.nickname||"Anonymous")+' ↔ '+esc(ce.nickname||"Anonymous")+'</b>'+
-          '<small>'+(ci.flag||"🌍")+' '+esc(ci.country||"?")+' ↔ '+(ce.flag||"🌍")+' '+esc(ce.country||"?")+' · mode: '+(r.mode||"random")+'</small></div>'+
+          '<small>'+(ci.flag||"🌍")+' '+esc(ci.country||"?")+' ↔ '+(ce.flag||"🌍")+' '+esc(ce.country||"?")+' · started '+started+' · '+(r.messageCount||0)+' messages · mode: '+(r.mode||"random")+'</small></div>'+
         '<span class="badge live">live</span>'+
         '<button class="btn sm" data-live="'+r.id+'">👁 Live view</button>'+
         '<button class="btn danger sm" data-close="'+r.id+'">End</button>'+
@@ -721,36 +971,6 @@ function renderRooms(rooms, staleRooms){
   });
 }
 function openLightbox(src){ el("lightboxImg").src=src; el("lightbox").style.display="flex"; }
-
-/* ---------- WORLD MAP (approximate, schematic — not pixel-precise cartography) ---------- */
-const COUNTRY_LATLNG={
-  US:[38,-97],GB:[54,-2],SK:[48.7,19.7],CZ:[49.8,15.5],DE:[51.2,10.5],FR:[46.2,2.2],ES:[40.5,-3.7],
-  IT:[42.8,12.6],PL:[51.9,19.1],NL:[52.1,5.3],AT:[47.5,14.6],HU:[47.2,19.5],RO:[45.9,25],UA:[48.4,31.2],
-  RU:[61,105],PT:[39.4,-8.2],SE:[60.1,18.6],NO:[60.5,8.5],FI:[61.9,25.7],DK:[56.3,9.5],BE:[50.5,4.5],
-  CH:[46.8,8.2],IE:[53.4,-8],GR:[39.1,21.8],TR:[38.9,35.2],BR:[-14.2,-51.9],MX:[23.6,-102.5],
-  AR:[-38.4,-63.6],CA:[56.1,-106.3],AU:[-25.3,133.8],NZ:[-40.9,174.9],JP:[36.2,138.3],KR:[35.9,127.8],
-  CN:[35.9,104.2],IN:[20.6,79],ID:[-0.8,113.9],PH:[12.9,121.8],TH:[15.9,100.9],VN:[14.1,108.3],
-  ZA:[-30.6,22.9],EG:[26.8,30.8],NG:[9.1,8.7],IL:[31,34.8],AE:[23.4,53.8],SA:[23.9,45.1],
-  HR:[45.1,15.2],SI:[46.2,15],BG:[42.7,25.5],RS:[44,21],LT:[55.2,23.9],LV:[56.9,24.6],EE:[58.6,25],XX:[20,0]
-};
-function renderWorldMap(byCountry){
-  const host=el("worldMap"); if(!host) return;
-  const w=900,h=420;
-  let dots="";
-  Object.keys(byCountry).forEach(function(cc){
-    const ll=COUNTRY_LATLNG[cc]||COUNTRY_LATLNG.XX;
-    const x=((ll[1]+180)/360)*w, y=((90-ll[0])/180)*h;
-    const n=byCountry[cc];
-    const r=Math.min(22,6+n*3);
-    dots+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="#22d3ee" fill-opacity="0.35" stroke="#22d3ee" stroke-width="1.5"><title>'+flagOf(cc)+' '+cc+': '+n+' online</title></circle>';
-    dots+='<text x="'+x+'" y="'+(y+4)+'" text-anchor="middle" font-size="11" fill="#ece9ff" font-weight="700">'+n+'</text>';
-  });
-  let grid="";
-  for(let gx=0;gx<=w;gx+=w/12) grid+='<line x1="'+gx+'" y1="0" x2="'+gx+'" y2="'+h+'" stroke="#ffffff10"/>';
-  for(let gy=0;gy<=h;gy+=h/6) grid+='<line x1="0" y1="'+gy+'" x2="'+w+'" y2="'+gy+'" stroke="#ffffff10"/>';
-  host.innerHTML='<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;height:280px;background:#0c0a20;border-radius:12px;border:1px solid var(--line)">'+grid+dots+'</svg>'+
-    '<p style="color:var(--muted-2);font-size:11.5px;margin-top:8px">Approximate positions by country (schematic, not exact geography). Circle size = number of people currently online from that country.</p>';
-}
 
 let liveViewState={ roomId:null, pcs:{}, unsubs:{} };
 async function openLiveView(roomId, ci, ce){
@@ -798,6 +1018,35 @@ function closeLiveView(){
   el("liveCallerVideo").srcObject=null; el("liveCalleeVideo").srcObject=null;
 }
 el("closeLiveView").onclick=closeLiveView;
+
+const COUNTRY_LATLNG={
+  US:[38,-97],GB:[54,-2],SK:[48.7,19.7],CZ:[49.8,15.5],DE:[51.2,10.5],FR:[46.2,2.2],ES:[40.5,-3.7],
+  IT:[42.8,12.6],PL:[51.9,19.1],NL:[52.1,5.3],AT:[47.5,14.6],HU:[47.2,19.5],RO:[45.9,25],UA:[48.4,31.2],
+  RU:[61,105],PT:[39.4,-8.2],SE:[60.1,18.6],NO:[60.5,8.5],FI:[61.9,25.7],DK:[56.3,9.5],BE:[50.5,4.5],
+  CH:[46.8,8.2],IE:[53.4,-8],GR:[39.1,21.8],TR:[38.9,35.2],BR:[-14.2,-51.9],MX:[23.6,-102.5],
+  AR:[-38.4,-63.6],CA:[56.1,-106.3],AU:[-25.3,133.8],NZ:[-40.9,174.9],JP:[36.2,138.3],KR:[35.9,127.8],
+  CN:[35.9,104.2],IN:[20.6,79],ID:[-0.8,113.9],PH:[12.9,121.8],TH:[15.9,100.9],VN:[14.1,108.3],
+  ZA:[-30.6,22.9],EG:[26.8,30.8],NG:[9.1,8.7],IL:[31,34.8],AE:[23.4,53.8],SA:[23.9,45.1],
+  HR:[45.1,15.2],SI:[46.2,15],BG:[42.7,25.5],RS:[44,21],LT:[55.2,23.9],LV:[56.9,24.6],EE:[58.6,25],XX:[20,0]
+};
+function renderWorldMap(byCountry){
+  const host=el("worldMap"); if(!host) return;
+  const w=900,h=420;
+  let dots="";
+  Object.keys(byCountry).forEach(function(cc){
+    const ll=COUNTRY_LATLNG[cc]||COUNTRY_LATLNG.XX;
+    const x=((ll[1]+180)/360)*w, y=((90-ll[0])/180)*h;
+    const n=byCountry[cc];
+    const r=Math.min(22,6+n*3);
+    dots+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="#22d3ee" fill-opacity="0.35" stroke="#22d3ee" stroke-width="1.5"><title>'+flagOf(cc)+' '+cc+': '+n+' online</title></circle>';
+    dots+='<text x="'+x+'" y="'+(y+4)+'" text-anchor="middle" font-size="11" fill="#ece9ff" font-weight="700">'+n+'</text>';
+  });
+  let grid="";
+  for(let gx=0;gx<=w;gx+=w/12) grid+='<line x1="'+gx+'" y1="0" x2="'+gx+'" y2="'+h+'" stroke="#ffffff10"/>';
+  for(let gy=0;gy<=h;gy+=h/6) grid+='<line x1="0" y1="'+gy+'" x2="'+w+'" y2="'+gy+'" stroke="#ffffff10"/>';
+  host.innerHTML='<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;height:280px;background:#0c0a20;border-radius:12px;border:1px solid var(--line)">'+grid+dots+'</svg>'+
+    '<p style="color:var(--muted-2);font-size:11.5px;margin-top:8px">Approximate positions by country (schematic, not exact geography). Circle size = number of people currently online from that country.</p>';
+}
 </script>
 </body>
 </html>
