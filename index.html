@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>FreeChat — Free Random Video Chat with Strangers</title>
-<meta name="description" content="FreeChat is a free random video chat platform. Meet new people instantly, no signup required, no download, moderated chat with text, voice messages, and emoji.">
+<title>Free2Chat — Free Random Video Chat with Strangers</title>
+<meta name="description" content="Free2Chat is a free random video chat platform. Meet new people instantly, no signup required, no download, moderated chat with text, voice messages, and emoji.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://jzac369.github.io/randomchat/">
-<meta property="og:title" content="FreeChat — Free Random Video Chat with Strangers">
+<meta property="og:title" content="Free2Chat — Free Random Video Chat with Strangers">
 <meta property="og:description" content="Meet new people instantly with free random video chat. No signup, no download, moderated.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://jzac369.github.io/randomchat/">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="FreeChat — Free Random Video Chat with Strangers">
+<meta name="twitter:title" content="Free2Chat — Free Random Video Chat with Strangers">
 <meta name="twitter:description" content="Meet new people instantly with free random video chat. No signup, no download, moderated.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -127,6 +127,7 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
 .field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px;font-weight:600}
 .field input,.field textarea{width:100%;background:var(--ov3);border:1px solid var(--line);border-radius:11px;color:var(--text);padding:12px 13px;font-size:14.5px;font-family:inherit;outline:none}
 .field input:focus,.field textarea:focus{border-color:#4b3f8c}
+input::placeholder,textarea::placeholder{color:var(--muted-2);opacity:.75}
 .btn-primary{
   width:100%;padding:14px;border-radius:14px;font-family:"Space Grotesk";font-weight:700;font-size:16px;
   background:var(--grad);color:#fff;box-shadow:0 14px 32px -10px #6d28d9cc;transition:.15s;position:relative;overflow:hidden
@@ -151,7 +152,7 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
 .videos .vtile.local{inset:12px;z-index:1;transition:all .25s ease}
 .videos.duo .vtile.remote{inset:12px;z-index:1}
 .videos.duo .vtile.local{
-  inset:auto; right:24px; bottom:24px; width:150px; height:112px;
+  inset:auto; right:24px; bottom:24px; width:180px; height:134px;
   border:2px solid var(--violet); box-shadow:0 10px 28px -8px #000000a0; z-index:3;
 }
 .vtile.speaking{border-color:var(--cyan);box-shadow:0 0 0 2px var(--cyan),0 0 26px #22d3ee55}
@@ -162,7 +163,9 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
 .vtile .placeholder{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted-2);font-size:13px;text-align:center;padding:20px}
 .vtile .corner-btn{position:absolute;background:#0a0819cc;border:1px solid var(--line);border-radius:8px;padding:5px 7px;font-size:13px;z-index:5}
 .local-cam-switch{left:10px;top:10px}
-.local-data-saver{left:10px;top:44px}
+.local-bottom-row{position:absolute;left:10px;bottom:10px;z-index:5;display:flex;align-items:center;gap:7px}
+.local-bottom-row .label{position:static}
+.local-bottom-row .local-data-saver{position:static}
 .searching{position:absolute;inset:0;display:grid;place-items:center;text-align:center;pointer-events:none}
 .searching.with-game{pointer-events:auto}
 .radar{width:100px;height:100px;border-radius:50%;border:2px solid #2a2350;position:relative;margin:0 auto 14px}
@@ -223,13 +226,14 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
 .reaction-bar button:hover{background:var(--ov6);transform:scale(1.15)}
 .chat-empty{margin:auto;text-align:center;color:var(--muted-2);font-size:13px;padding:24px}
 
-.composer{padding:10px 12px;border-bottom:1px solid var(--line-soft);background:var(--ov2);display:flex;flex-direction:column;gap:7px}
+.composer{padding:10px 12px;border-top:1px solid var(--line-soft);background:var(--ov2);display:flex;flex-direction:column;gap:7px}
 .emoji-bar{display:flex;gap:2px;flex-wrap:wrap;max-height:0;overflow:hidden;transition:max-height .25s}
 .emoji-bar.open{max-height:150px;overflow-y:auto;padding-bottom:4px}
 .emoji-bar button{width:34px;height:34px;border-radius:9px;font-size:19px;background:transparent}
 .emoji-bar button:hover{background:var(--ov6)}
 .emoji-cat{width:100%;font-size:10.5px;color:var(--muted-2);text-transform:uppercase;letter-spacing:1px;padding:6px 4px 2px}
-.composer-row{display:flex;align-items:flex-end;gap:6px;flex-wrap:wrap}
+.composer-icons{display:flex;gap:6px;flex-wrap:wrap}
+.composer-row{display:flex;align-items:flex-end;gap:6px;width:100%}
 .icon-btn{height:38px;padding:0 10px;border-radius:11px;background:var(--ov3);border:1px solid var(--line);display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;flex:0 0 auto;transition:.15s}
 .icon-btn:hover{background:var(--ov6)}
 .icon-btn.active{background:var(--grad);border-color:transparent}
@@ -268,7 +272,7 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
 @media(max-width:880px){
   .stage{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}
   .chat-panel{border-left:0;border-top:1px solid var(--line-soft);max-height:40vh}
-  .videos.duo .vtile.local{width:88px;height:68px;right:10px;bottom:10px}
+  .videos.duo .vtile.local{width:106px;height:82px;right:10px;bottom:10px}
 }
 @media(max-height:740px), (max-width:420px){
   .topbar{padding:8px 12px}
@@ -288,7 +292,7 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
 <body>
 <div id="app">
   <div class="topbar">
-    <div class="brand"><span class="orb"></span> Free<b>Chat</b></div>
+    <div class="brand"><span class="orb"></span> Free2<b>Chat</b></div>
     <span class="pill live hidden" id="onlinePill"><span class="dot"></span><span id="onlineCount">—</span> online</span>
     <div class="spacer"></div>
     <button class="icon-toggle" id="themeToggle" title="Toggle light/dark">🌙</button>
@@ -331,7 +335,7 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
         <div class="feedback-note"><a id="feedbackLink">Send us a message</a></div>
       </div>
       <p class="seo-text" id="seoText">
-        FreeChat is a free random video chat website where you can meet new people instantly —
+        Free2Chat is a free random video chat website where you can meet new people instantly —
         no signup, no download, no fees. Just open the page, turn on your camera, and get connected
         with a random stranger for live video and text chat. Click "Next" any time to meet someone else.
       </p>
@@ -346,10 +350,12 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
           <div class="vtile local">
             <video id="localVideo" autoplay muted playsinline></video>
             <div class="placeholder" id="localPlaceholder">Camera is off</div>
-            <div class="label"><span class="flag" id="localFlag">🌍</span> You</div>
+            <div class="local-bottom-row">
+              <div class="label"><span class="flag" id="localFlag">🌍</span> You</div>
+              <button class="corner-btn local-data-saver" id="dataSaverBtn" title="Data saver">📶</button>
+            </div>
             <div class="mut hidden" id="localMuteBadge">🔇</div>
             <button class="corner-btn local-cam-switch hidden" id="camSwitchBtn" title="Switch camera">🔄</button>
-            <button class="corner-btn local-data-saver" id="dataSaverBtn" title="Data saver">📶</button>
           </div>
           <div class="vtile remote hidden" id="remoteTile">
             <video autoplay playsinline></video>
@@ -391,6 +397,10 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
           </div>
           <button class="rep" id="reportBtn" title="Report and skip">Report</button>
         </div>
+        <div class="typing-row hidden" id="typingRow"><span class="typing-dots"><i></i><i></i><i></i></span> typing…</div>
+        <div class="messages" id="messages">
+          <div class="chat-empty" id="chatEmpty">Messages will appear here. Be kind. 💜</div>
+        </div>
         <div class="composer">
           <div class="rec-ui" id="recUi">
             <span class="rdot"></span><span>Recording</span><span class="rtime" id="recTime">0:00</span>
@@ -398,18 +408,16 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
             <button class="cancel" id="recCancel">Cancel</button>
           </div>
           <div class="emoji-bar" id="emojiBar"></div>
-          <div class="composer-row" id="composerRow">
+          <div class="composer-icons" id="composerIcons">
             <button class="icon-btn" id="emojiToggle">😊</button>
             <button class="icon-btn" id="voiceBtn">🎙️</button>
             <button class="icon-btn" id="icebreakerBtn">🎲</button>
             <button class="icon-btn" id="translateToggle" title="Auto-translate incoming messages to English">🌐</button>
+          </div>
+          <div class="composer-row" id="composerRow">
             <textarea id="msgInput" rows="1" placeholder="Type a message…"></textarea>
             <button class="send-btn" id="sendBtn" disabled>Send</button>
           </div>
-        </div>
-        <div class="typing-row hidden" id="typingRow"><span class="typing-dots"><i></i><i></i><i></i></span> typing…</div>
-        <div class="messages" id="messages">
-          <div class="chat-empty" id="chatEmpty">Messages will appear here. Be kind. 💜</div>
         </div>
       </div>
     </div>
@@ -443,7 +451,7 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
   <div class="modal" style="max-width:460px">
     <button class="modal-close" id="feedbackClose">×</button>
     <h2>Send us a message</h2>
-    <p class="m-sub" style="margin-bottom:14px">Found a bug, or have an idea to make FreeChat better? Let us know.</p>
+    <p class="m-sub" style="margin-bottom:14px">Found a bug, or have an idea to make Free2Chat better? Let us know.</p>
     <div class="field"><label>Your message</label><textarea id="feedbackText" rows="4" maxlength="1000" placeholder="What's on your mind?" style="width:100%;resize:vertical;background:var(--ov3);border:1px solid var(--line);border-radius:12px;color:var(--text);padding:10px 13px;font-family:inherit;font-size:14px;outline:none"></textarea></div>
     <div class="field"><label>Contact (optional)</label><input type="text" id="feedbackContact" placeholder="Email, if you'd like a reply" maxlength="120"></div>
     <button class="btn-primary" id="feedbackSend">Send</button>
@@ -473,7 +481,7 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
 <div class="modal-back" id="blockedModal">
   <div class="modal">
     <h2>Not available in your region</h2>
-    <p class="m-sub">Sorry, FreeChat isn't available in your country right now.</p>
+    <p class="m-sub">Sorry, Free2Chat isn't available in your country right now.</p>
   </div>
 </div>
 
@@ -486,7 +494,7 @@ button{font-family:inherit;cursor:pointer;border:0;color:inherit}
 <script src="config.js"></script>
 <script>
 /* ============================================================
-   FreeChat — random video/text chat (v3.0.0)
+   Free2Chat — random video/text chat (v3.0.0)
    Firebase (Spark) signaling + WebRTC P2P.
    ============================================================ */
 firebase.initializeApp(FIREBASE_CONFIG);
@@ -515,7 +523,7 @@ function fmtTime(s){ s=Math.max(0,Math.round(s)); return Math.floor(s/60)+":"+St
 function applyTheme(t){
   document.documentElement.setAttribute("data-theme", t);
   el("themeToggle").textContent = t==="light" ? "☀️" : "🌙";
-  try{ localStorage.setItem("freechat-theme", t); }catch(e){}
+  try{ localStorage.setItem("free2chat-theme", t); }catch(e){}
 }
 el("themeToggle").onclick=()=>{
   const cur = document.documentElement.getAttribute("data-theme");
@@ -523,7 +531,7 @@ el("themeToggle").onclick=()=>{
 };
 (function initTheme(){
   let t="dark";
-  try{ t = localStorage.getItem("freechat-theme") || "dark"; }catch(e){}
+  try{ t = localStorage.getItem("free2chat-theme") || "dark"; }catch(e){}
   applyTheme(t);
 })();
 
@@ -649,8 +657,8 @@ function logHistory(partnerNickname, country, flag){
 // Záložný text pre prípad, že admin ešte nikdy neotvoril admin.html (a teda ešte
 // nezapísal default text do config/legal). Rovnaký text ako DEFAULT_TERMS/DEFAULT_PRIVACY
 // v admin.html — ide len o poistku, aby návštevník nikdy nevidel "Not set."
-const FALLBACK_TERMS = "Last updated: (set by admin)\n\nBy using FreeChat, you agree to the following terms.\n\n1. Eligibility - You must be at least 18 years old to use this service.\n2. Nature of the service - FreeChat connects you with random strangers for live video and text chat. Conversations are not scripted or curated; you may encounter people whose views, behavior, or content you find objectionable. Use your own judgment.\n3. Acceptable use - You agree not to: share sexually explicit material involving minors (zero tolerance, reported to authorities where applicable); harass, threaten, or abuse other users; share others' personal information without consent; solicit money, advertise, or spam; broadcast illegal activity.\n4. Moderation - To keep the platform safe, FreeChat automatically scans text messages for prohibited keywords and personal contact information (emails, phone numbers), and periodically captures a low-resolution snapshot from your camera during an active chat for moderation review. Moderators may also view a live preview of an active chat when investigating a report. Violations may result in a temporary or permanent ban.\n5. No warranty - FreeChat is provided \"as is\" without warranties of any kind. We do not guarantee the identity, age, or intentions of other users.\n6. Limitation of liability - To the maximum extent permitted by law, FreeChat and its operators are not liable for damages arising from your use of the service or your interactions with other users.\n7. Termination - We may suspend or terminate your access at any time, with or without notice, for any violation of these terms.\n8. Changes - We may update these terms at any time. Continued use after changes constitutes acceptance.\n\nThis is a general template and not a substitute for legal advice tailored to your jurisdiction.";
-const FALLBACK_PRIVACY = "Last updated: (set by admin)\n\nThis policy explains what information FreeChat collects and how it's used.\n\n1. Information we collect\n- The nickname you choose (public, shown to chat partners)\n- Approximate country/location, derived from your IP address\n- Chat messages and voice messages you send during a session\n- Periodic low-resolution snapshots from your camera during an active chat, used for moderation\n- Basic technical information (browser type, approximate device information) that may be used to detect abuse\n- Reports you submit about other users\n\n2. How we use this information\n- To connect you with other users and operate the chat\n- To moderate content and enforce our Terms of Use (reviewing reports, automatic keyword/contact-info filtering, periodic camera snapshots)\n- To detect and prevent abuse across sessions\n\n3. What we don't do\n- We do not sell your personal information.\n- We do not permanently record full video calls; video/audio is transmitted directly between participants and is not stored, aside from the periodic low-resolution snapshots described above.\n\n4. Retention - Chat messages, snapshots, and session data are retained for a limited period for moderation purposes and may be deleted periodically.\n\n5. Your choices - You can end a chat at any time. You can choose not to enable your camera or microphone.\n\n6. Contact - Questions about this policy can be directed to the platform operator.\n\nThis is a general template and not a substitute for legal advice tailored to your jurisdiction or applicable data protection laws (e.g. GDPR).";
+const FALLBACK_TERMS = "Last updated: (set by admin)\n\nBy using Free2Chat, you agree to the following terms.\n\n1. Eligibility - You must be at least 18 years old to use this service.\n2. Nature of the service - Free2Chat connects you with random strangers for live video and text chat. Conversations are not scripted or curated; you may encounter people whose views, behavior, or content you find objectionable. Use your own judgment.\n3. Acceptable use - You agree not to: share sexually explicit material involving minors (zero tolerance, reported to authorities where applicable); harass, threaten, or abuse other users; share others' personal information without consent; solicit money, advertise, or spam; broadcast illegal activity.\n4. Moderation - To keep the platform safe, Free2Chat automatically scans text messages for prohibited keywords and personal contact information (emails, phone numbers), and periodically captures a low-resolution snapshot from your camera during an active chat for moderation review. Moderators may also view a live preview of an active chat when investigating a report. Violations may result in a temporary or permanent ban.\n5. No warranty - Free2Chat is provided \"as is\" without warranties of any kind. We do not guarantee the identity, age, or intentions of other users.\n6. Limitation of liability - To the maximum extent permitted by law, Free2Chat and its operators are not liable for damages arising from your use of the service or your interactions with other users.\n7. Termination - We may suspend or terminate your access at any time, with or without notice, for any violation of these terms.\n8. Changes - We may update these terms at any time. Continued use after changes constitutes acceptance.\n\nThis is a general template and not a substitute for legal advice tailored to your jurisdiction.";
+const FALLBACK_PRIVACY = "Last updated: (set by admin)\n\nThis policy explains what information Free2Chat collects and how it's used.\n\n1. Information we collect\n- The nickname you choose (public, shown to chat partners)\n- Approximate country/location, derived from your IP address\n- Chat messages and voice messages you send during a session\n- Periodic low-resolution snapshots from your camera during an active chat, used for moderation\n- Basic technical information (browser type, approximate device information) that may be used to detect abuse\n- Reports you submit about other users\n\n2. How we use this information\n- To connect you with other users and operate the chat\n- To moderate content and enforce our Terms of Use (reviewing reports, automatic keyword/contact-info filtering, periodic camera snapshots)\n- To detect and prevent abuse across sessions\n\n3. What we don't do\n- We do not sell your personal information.\n- We do not permanently record full video calls; video/audio is transmitted directly between participants and is not stored, aside from the periodic low-resolution snapshots described above.\n\n4. Retention - Chat messages, snapshots, and session data are retained for a limited period for moderation purposes and may be deleted periodically.\n\n5. Your choices - You can end a chat at any time. You can choose not to enable your camera or microphone.\n\n6. Contact - Questions about this policy can be directed to the platform operator.\n\nThis is a general template and not a substitute for legal advice tailored to your jurisdiction or applicable data protection laws (e.g. GDPR).";
 let legalLoaded=false, legalCache=null;
 el("termsLink").onclick=async()=>{
   el("termsModal").classList.add("open");
@@ -681,7 +689,7 @@ el("feedbackSend").onclick=async()=>{
     await db.collection("feedback").add({
       text, contact:(el("feedbackContact").value||"").trim(),
       uid:S.uid||null, nickname:S.nickname||null, country:S.country||null,
-      page: S.mode||"landing", t:FV.serverTimestamp()
+      page: S.mode||"landing", read:false, t:FV.serverTimestamp()
     });
     el("feedbackSentNote").classList.remove("hidden");
     el("feedbackText").value=""; el("feedbackContact").value="";
@@ -747,13 +755,13 @@ function checkCountryBlock(){
 /* ============================================================ BROADCAST */
 db.collection("config").doc("broadcast").onSnapshot(snap=>{
   const d=snap.data()||{};
-  let dismissed=""; try{ dismissed = localStorage.getItem("freechat-broadcast-dismissed")||""; }catch(e){}
+  let dismissed=""; try{ dismissed = localStorage.getItem("free2chat-broadcast-dismissed")||""; }catch(e){}
   if(d.active && d.message && d.message!==dismissed){ el("broadcastText").textContent=d.message; el("broadcastBar").classList.remove("hidden"); el("broadcastBar")._msg=d.message; }
   else { el("broadcastBar").classList.add("hidden"); }
 },()=>{});
 el("broadcastClose").onclick=()=>{
   el("broadcastBar").classList.add("hidden");
-  try{ localStorage.setItem("freechat-broadcast-dismissed", el("broadcastBar")._msg||""); }catch(e){}
+  try{ localStorage.setItem("free2chat-broadcast-dismissed", el("broadcastBar")._msg||""); }catch(e){}
 };
 
 /* ============================================================ MODERATION */
