@@ -6,11 +6,11 @@
 <title>Free2Chat — Free Random Video Chat with Strangers</title>
 <meta name="description" content="Free2Chat is a free random video chat platform. Meet new people instantly, no signup required, no download, moderated chat with text, voice messages, and emoji.">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://jzac369.github.io/randomchat/">
+<link rel="canonical" href="https://free2chat.online/">
 <meta property="og:title" content="Free2Chat — Free Random Video Chat with Strangers">
 <meta property="og:description" content="Meet new people instantly with free random video chat. No signup, no download, moderated.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://jzac369.github.io/randomchat/">
+<meta property="og:url" content="https://free2chat.online/">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Free2Chat — Free Random Video Chat with Strangers">
 <meta name="twitter:description" content="Meet new people instantly with free random video chat. No signup, no download, moderated.">
@@ -141,6 +141,14 @@ input::placeholder,textarea::placeholder{color:var(--muted-2);opacity:.75}
 .feedback-note a{color:var(--muted-2);text-decoration:none;cursor:pointer;border-bottom:1px dotted var(--muted-2);padding-bottom:1px}
 .feedback-note a:hover{color:var(--muted)}
 .seo-text{color:var(--muted-2);font-size:12px;max-width:560px;margin:16px auto 0;line-height:1.6}
+.seo-block{max-width:560px;margin:16px auto 0}
+.seo-block .seo-text{margin:0 0 10px}
+.faq-item{margin-top:7px;border:1px solid var(--line-soft);border-radius:10px;padding:9px 13px;background:var(--ov2);text-align:left}
+.faq-item summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted);list-style:none}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::before{content:"+  ";color:var(--violet);font-weight:700}
+.faq-item[open] summary::before{content:"–  "}
+.faq-item p{margin:8px 0 0;font-size:12px;color:var(--muted-2);line-height:1.6}
 .blocked-note{color:var(--red);font-size:14px;font-weight:600;text-align:center;padding:20px}
 
 .stage{display:grid;grid-template-columns:1fr 380px;width:100%;gap:0}
@@ -284,15 +292,64 @@ input::placeholder,textarea::placeholder{color:var(--muted-2);opacity:.75}
   .opt-row{padding:8px 11px}
   .opt-row .txt b{font-size:12.5px}
   .opt-row .txt small{display:none}
-  .seo-text{display:none}
+  .seo-block{margin-top:10px}
+  .seo-text{font-size:11px}
+  .faq-item{padding:7px 10px}
+  .faq-item summary{font-size:11.5px}
+  .faq-item p{font-size:11px}
   .field{margin-bottom:8px}
 }
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Free2Chat",
+  "url": "https://free2chat.online/",
+  "description": "Free2Chat is a free random video chat platform. Meet new people instantly, no signup required, no download, moderated chat with text, voice messages, and emoji.",
+  "applicationCategory": "SocialNetworkingApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is Free2Chat really free?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Free2Chat is 100% free to use — no hidden fees, no premium tier, no payment required to start a random video chat." }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to sign up or download an app?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. There's no account and nothing to install. Free2Chat runs directly in your browser — pick a nickname and you're chatting with a random stranger in seconds." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is the video chat private and safe?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Video and audio stream directly between you and the other person (peer-to-peer) and aren't recorded. Chats might be moderated and you can report anyone who breaks the rules." }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use text chat only, without a camera?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes — the camera is optional. You can chat by text alone, or turn your camera on at any point during a random video chat." }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I skip to a new random person?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Click \"Next\" at any time to instantly end the current chat and connect with someone new." }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <div id="app">
   <div class="topbar">
-    <div class="brand"><span class="orb"></span> Free2<b>Chat</b></div>
+    <div class="brand"><span class="orb"></span><span class="brand-name">Free2<b>Chat</b></span></div>
     <span class="pill live hidden" id="onlinePill"><span class="dot"></span><span id="onlineCount">—</span> online</span>
     <div class="spacer"></div>
     <button class="icon-toggle" id="themeToggle" title="Toggle light/dark">🌙</button>
@@ -334,11 +391,34 @@ input::placeholder,textarea::placeholder{color:var(--muted-2);opacity:.75}
         <div class="age-note">By clicking you confirm you are 18+ and agree to behave respectfully. <a id="termsLink">Terms &amp; Privacy</a></div>
         <div class="feedback-note"><a id="feedbackLink">Send us a message</a></div>
       </div>
-      <p class="seo-text" id="seoText">
-        Free2Chat is a free random video chat website where you can meet new people instantly —
-        no signup, no download, no fees. Just open the page, turn on your camera, and get connected
-        with a random stranger for live video and text chat. Click "Next" any time to meet someone else.
-      </p>
+      <div class="seo-block" id="seoBlock">
+        <p class="seo-text" id="seoText">
+          Free2Chat is a completely free random video chat website where you can meet new people instantly —
+          no signup, no download, no fees. Talk to strangers from around the world through live video chat,
+          voice, or text — just open the page, turn on your camera, and get connected right away. Not vibing
+          with someone? Click "Next" any time to start a new random chat with someone else.
+        </p>
+        <details class="faq-item">
+          <summary>Is Free2Chat really free?</summary>
+          <p>Yes. Free2Chat is 100% free to use — no hidden fees, no premium tier, no payment required to start a random video chat.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do I need to sign up or download an app?</summary>
+          <p>No. There's no account and nothing to install. Free2Chat runs directly in your browser — pick a nickname and you're chatting with a random stranger in seconds.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Is the video chat private and safe?</summary>
+          <p>Video and audio stream directly between you and the other person (peer-to-peer) and aren't recorded. Chats might be moderated and you can report anyone who breaks the rules.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Can I use text chat only, without a camera?</summary>
+          <p>Yes — the camera is optional. You can chat by text alone, or turn your camera on at any point during a random video chat.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How do I skip to a new random person?</summary>
+          <p>Click "Next" at any time to instantly end the current chat and connect with someone new.</p>
+        </details>
+      </div>
     </div>
   </div>
 
@@ -509,7 +589,7 @@ const S = {
   pc:null, roomId:null, isCaller:false, peer:null, mode:"idle", viewerPc:null, settings:{}, blocked:false,
   unsub:{}, searching:false, recorder:null, recChunks:[], recTimer:null, recStart:0, recCancelled:false,
   moderation:{keywords:[], banned:{}, bannedEmails:{}, shadow:{}, shadowEmails:{}}, retryHandle:null, typingTimer:null,
-  translateOn:false, lastAppliedAnswer:null, lastAppliedOffer:null, lastAppliedRenegOffer:null, lastAppliedRenegAnswer:null,
+  translateOn:false, translateWarned:false, lastAppliedAnswer:null, lastAppliedOffer:null, lastAppliedRenegOffer:null, lastAppliedRenegAnswer:null,
   lastActivity:Date.now(), inactivityWarned:false, inactivityTimer:null
 };
 
@@ -810,12 +890,11 @@ function playMsgSound(){ playTone(520,0.15); if(navigator.vibrate) navigator.vib
 
 /* ============================================================ TRANSLATE (free, unofficial endpoint — best-effort) */
 async function translateText(text){
-  try{
-    const url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q="+encodeURIComponent(text);
-    const r = await fetch(url);
-    const j = await r.json();
-    return j[0].map(seg=>seg[0]).join("");
-  }catch(e){ return null; }
+  const url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q="+encodeURIComponent(text);
+  const r = await fetch(url);
+  if(!r.ok) throw new Error("Translate HTTP "+r.status);
+  const j = await r.json();
+  return j[0].map(seg=>seg[0]).join("");
 }
 el("translateToggle").onclick=()=>{
   S.translateOn=!S.translateOn;
@@ -1323,6 +1402,11 @@ function renderMsg(m, id){
         translateText(m.text||"").then(tr=>{
           if(tr && tr.trim().toLowerCase()!==(m.text||"").trim().toLowerCase()){
             const s=document.createElement("span"); s.className="translated"; s.textContent="🌐 "+tr; d.appendChild(s);
+          }
+        }).catch(()=>{
+          if(!S.translateWarned){
+            S.translateWarned=true;
+            toast("Auto-translate isn't reachable right now — try again later.","err");
           }
         });
       }
